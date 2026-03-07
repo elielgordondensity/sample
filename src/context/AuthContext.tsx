@@ -158,3 +158,16 @@ export function useAuth(): AuthContextValue {
   if (!ctx) throw new Error("useAuth must be used within AuthProvider");
   return ctx;
 }
+
+export function useIsAuthenticated(): {
+  isLoading: boolean;
+  isAuthenticated: boolean;
+  hasOrgProduct: boolean;
+} {
+  const { isLoading, token, org, product } = useAuth();
+  return {
+    isLoading,
+    isAuthenticated: !!token,
+    hasOrgProduct: !!org && !!product,
+  };
+}

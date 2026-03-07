@@ -3,10 +3,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Text } from "react-native";
 import { colors, typography } from "../components/tokens";
-import { LoadingView } from "../components/ui";
-import { useAuth } from "../context/AuthContext";
+import { useIsAuthenticated } from "../context/AuthContext";
 
-import LoginScreen from "../screens/LoginScreen";
 import OrgProductSelector from "../screens/OrgProductSelector";
 import DevicesScreen from "../screens/DevicesScreen";
 import FirmwareScreen from "../screens/FirmwareScreen";
@@ -14,8 +12,7 @@ import DeploymentsScreen from "../screens/DeploymentsScreen";
 
 // ── Type definitions ─────────────────────────────────────────────
 
-export type RootStackParamList = {
-  Login: undefined;
+export type HomeStackParamList = {
   OrgProduct: undefined;
   Main: undefined;
 };
@@ -26,7 +23,7 @@ export type MainTabParamList = {
   Deployments: undefined;
 };
 
-const Stack = createNativeStackNavigator<RootStackParamList>();
+const Stack = createNativeStackNavigator<HomeStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 // ── Tab icon helper ──────────────────────────────────────────────
@@ -96,21 +93,14 @@ function MainTabs() {
   );
 }
 
-// ── Root navigator ───────────────────────────────────────────────
+// ── Home navigator ───────────────────────────────────────────────
 
-export default function RootNavigator() {
-  const { isLoading, token, org, product } = useAuth();
-
-  if (isLoading) return <LoadingView message="Loading…" />;
-
-  const isLoggedIn = !!token;
-  const hasOrgProduct = !!org && !!product;
+export default function HomeNavigator() {
+  const { hasOrgProduct } = useIsAuthenticated();
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {!isLoggedIn ? (
-        <Stack.Screen name="Login" component={LoginScreen} />
-      ) : !hasOrgProduct ? (
+      {!hasOrgProduct ? (
         <Stack.Screen name="OrgProduct" component={OrgProductSelector} />
       ) : (
         <Stack.Screen name="Main" component={MainTabs} />
