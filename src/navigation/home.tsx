@@ -1,7 +1,6 @@
-import { Text } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { colors, typography } from "../components/tokens";
+import { createNativeBottomTabNavigator } from "@bottom-tabs/react-navigation";
+import { colors } from "../components/tokens";
 import { useHasOrgProduct, useNeedsOrgProduct } from "../context/OrgProductContext";
 
 import OrgProductSelector from "../screens/OrgProductSelector";
@@ -9,56 +8,37 @@ import DevicesScreen from "../screens/DevicesScreen";
 import FirmwareScreen from "../screens/FirmwareScreen";
 import DeploymentsScreen from "../screens/DeploymentsScreen";
 
-// ── Tab icon helper ──────────────────────────────────────────────
+// ── Main tabs (native platform tabs) ─────────────────────────────
 
-function TabIcon({ label, focused }: { label: string; focused: boolean }) {
-  return (
-    <Text
-      style={{
-        ...typography.caption,
-        fontSize: 18,
-        color: focused ? colors.accent : colors.textTertiary,
-      }}
-    >
-      {label}
-    </Text>
-  );
-}
-
-// ── Main tabs ────────────────────────────────────────────────────
-
-const MainTabs = createBottomTabNavigator({
+const MainTabs = createNativeBottomTabNavigator({
   screenOptions: {
     headerShown: false,
-    tabBarStyle: {
-      backgroundColor: colors.surface,
-      borderTopColor: colors.border,
-      borderTopWidth: 1,
-    },
     tabBarActiveTintColor: colors.accent,
     tabBarInactiveTintColor: colors.textTertiary,
-    tabBarLabelStyle: {
-      ...typography.caption,
-      marginTop: -2,
-    },
   },
   screens: {
     Devices: {
       screen: DevicesScreen,
       options: {
-        tabBarIcon: ({ focused }) => <TabIcon label="📱" focused={focused} />,
+        tabBarIcon: ({ focused }) => ({
+          sfSymbol: focused ? "iphone" : "iphone",
+        }),
       },
     },
     Firmware: {
       screen: FirmwareScreen,
       options: {
-        tabBarIcon: ({ focused }) => <TabIcon label="📦" focused={focused} />,
+        tabBarIcon: ({ focused }) => ({
+          sfSymbol: focused ? "shippingbox.fill" : "shippingbox",
+        }),
       },
     },
     Deployments: {
       screen: DeploymentsScreen,
       options: {
-        tabBarIcon: ({ focused }) => <TabIcon label="🚀" focused={focused} />,
+        tabBarIcon: ({ focused }) => ({
+          sfSymbol: focused ? "paperplane.fill" : "paperplane",
+        }),
       },
     },
   },
