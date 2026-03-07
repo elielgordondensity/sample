@@ -3,13 +3,15 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Channel, Socket } from "phoenix";
 import type { Device, DeviceListResponse } from "../api/generated/schemas";
 import { useAuth } from "../context/AuthContext";
+import { useOrgProduct } from "../context/OrgProductContext";
 
 /**
  * Connects a Phoenix WebSocket to `product:{org}:{product}` and patches
  * the React Query device list cache on presence_diff and update events.
  */
 export function useDeviceChannel() {
-  const { instanceUrl, token, org, product } = useAuth();
+  const { instanceUrl, token } = useAuth();
+  const { org, product } = useOrgProduct();
   const queryClient = useQueryClient();
   const socketRef = useRef<Socket | null>(null);
   const channelRef = useRef<Channel | null>(null);

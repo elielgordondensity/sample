@@ -9,10 +9,12 @@ import {
 import { colors, radius, spacing, typography } from "../components/tokens";
 import { EmptyView, ErrorView, LoadingView } from "../components/ui";
 import { useAuth } from "../context/AuthContext";
+import { useOrgProduct } from "../context/OrgProductContext";
 import { useOrgs, useProducts } from "../hooks/useApi";
 
 export default function OrgProductSelector() {
-  const { selectOrgAndProduct, logout } = useAuth();
+  const { logout } = useAuth();
+  const { selectOrgAndProduct } = useOrgProduct();
   const [selectedOrg, setSelectedOrg] = useState<string | null>(null);
 
   const orgsQuery = useOrgs();

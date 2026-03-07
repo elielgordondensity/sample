@@ -17,13 +17,13 @@ import {
   TagPill,
   UpdateStatusChip,
 } from "../components/ui";
-import { useAuth } from "../context/AuthContext";
+import { useOrgProduct } from "../context/OrgProductContext";
 import { useDevices } from "../hooks/useApi";
 import { useDeviceChannel } from "../hooks/useDeviceChannel";
 import type { Device } from "../api/generated/schemas";
 
 export default function DevicesScreen() {
-  const { org, product, resetOrgAndProduct } = useAuth();
+  const { org, product, resetOrgAndProduct } = useOrgProduct();
   const [search, setSearch] = useState("");
   const devicesQuery = useDevices(search ? { search } : undefined);
 

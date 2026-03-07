@@ -3,6 +3,7 @@ import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "./src/context/AuthContext";
+import { OrgProductProvider } from "./src/context/OrgProductContext";
 import Navigation from "./src/navigation/root";
 import { colors } from "./src/components/tokens";
 
@@ -40,8 +41,10 @@ export default function App() {
     <SafeAreaProvider>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <Navigation theme={navTheme} />
-          <StatusBar style="light" />
+          <OrgProductProvider>
+            <Navigation theme={navTheme} />
+            <StatusBar style="light" />
+          </OrgProductProvider>
         </AuthProvider>
       </QueryClientProvider>
     </SafeAreaProvider>

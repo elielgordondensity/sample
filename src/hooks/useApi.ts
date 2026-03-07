@@ -10,6 +10,7 @@ import type {
   UserResponse,
 } from "../api/generated/schemas";
 import { useAuth } from "../context/AuthContext";
+import { useOrgProduct } from "../context/OrgProductContext";
 
 /**
  * Thin wrappers around the Orval-generated types that enforce
@@ -20,7 +21,8 @@ import { useAuth } from "../context/AuthContext";
  */
 
 function useAuthGuard() {
-  const { token, org, product } = useAuth();
+  const { token } = useAuth();
+  const { org, product } = useOrgProduct();
   return { org, product, enabled: !!token && !!org && !!product };
 }
 

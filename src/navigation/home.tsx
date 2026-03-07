@@ -2,7 +2,7 @@ import { Text } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { colors, typography } from "../components/tokens";
-import { useHasOrgProduct, useNeedsOrgProduct } from "../context/AuthContext";
+import { useHasOrgProduct, useNeedsOrgProduct } from "../context/OrgProductContext";
 
 import OrgProductSelector from "../screens/OrgProductSelector";
 import DevicesScreen from "../screens/DevicesScreen";

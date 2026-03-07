@@ -25,8 +25,6 @@ interface AuthState {
   isLoading: boolean;
   instanceUrl: string | null;
   token: string | null;
-  org: string | null;
-  product: string | null;
 }
 
 interface AuthContextValue extends AuthState {
@@ -37,8 +35,6 @@ interface AuthContextValue extends AuthState {
     password: string,
   ) => Promise<void>;
   logout: () => Promise<void>;
-  selectOrgAndProduct: (org: string, product: string) => void;
-  resetOrgAndProduct: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -48,8 +44,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isLoading: true,
     instanceUrl: null,
     token: null,
-    org: null,
-    product: null,
   });
 
   // Rehydrate on boot
@@ -57,14 +51,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     (async () => {
       const token = await getToken();
       const instanceUrl = getString(STORAGE_KEYS.INSTANCE_URL) ?? null;
-      const org = getString(STORAGE_KEYS.ORG) ?? null;
-      const product = getString(STORAGE_KEYS.PRODUCT) ?? null;
 
       if (token && instanceUrl) {
         configureAxios(instanceUrl, token);
       }
 
-      setState({ isLoading: false, instanceUrl, token, org, product });
+      setState({ isLoading: false, instanceUrl, token });
     })();
   }, []);
 
@@ -79,12 +71,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await setToken(token);
     setString(STORAGE_KEYS.INSTANCE_URL, instanceUrl);
     configureAxios(instanceUrl, token);
-    setState((prev) => ({ ...prev, instanceUrl, token, org: null, product: null }));
+    setState((prev) => ({ ...prev, instanceUrl, token }));
   }, []);
 
   const loginWithCredentials = useCallback(
     async (instanceUrl: string, email: string, password: string) => {
-      // Authenticate with email/password to obtain a token
       const authResponse = await axios.post<AuthResponse>(
         `${instanceUrl}/api/users/auth`,
         { email, password },
@@ -95,7 +86,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error("No token received");
       }
 
-      // Validate the token by fetching the current user
       configureAxios(instanceUrl, authToken);
       const userResponse = await customInstance<UserResponse>({
         url: "/users/me",
@@ -121,21 +111,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isLoading: false,
       instanceUrl: null,
       token: null,
-      org: null,
-      product: null,
     });
-  }, []);
-
-  const selectOrgAndProduct = useCallback((org: string, product: string) => {
-    setString(STORAGE_KEYS.ORG, org);
-    setString(STORAGE_KEYS.PRODUCT, product);
-    setState((prev) => ({ ...prev, org, product }));
-  }, []);
-
-  const resetOrgAndProduct = useCallback(() => {
-    remove(STORAGE_KEYS.ORG);
-    remove(STORAGE_KEYS.PRODUCT);
-    setState((prev) => ({ ...prev, org: null, product: null }));
   }, []);
 
   const value = useMemo<AuthContextValue>(
@@ -144,10 +120,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       login,
       loginWithCredentials,
       logout,
-      selectOrgAndProduct,
-      resetOrgAndProduct,
     }),
-    [state, login, loginWithCredentials, logout, selectOrgAndProduct, resetOrgAndProduct],
+    [state, login, loginWithCredentials, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -159,19 +133,6 @@ export function useAuth(): AuthContextValue {
   return ctx;
 }
 
-export function useIsAuthenticated(): {
-  isLoading: boolean;
-  isAuthenticated: boolean;
-  hasOrgProduct: boolean;
-} {
-  const { isLoading, token, org, product } = useAuth();
-  return {
-    isLoading,
-    isAuthenticated: !!token,
-    hasOrgProduct: !!org && !!product,
-  };
-}
-
 // Boolean hooks for React Navigation static `if` directives
 export function useIsSignedIn() {
   const { token } = useAuth();
@@ -181,14 +142,4 @@ export function useIsSignedIn() {
 export function useIsSignedOut() {
   const { token } = useAuth();
   return !token;
-}
-
-export function useHasOrgProduct() {
-  const { org, product } = useAuth();
-  return !!org && !!product;
-}
-
-export function useNeedsOrgProduct() {
-  const { org, product } = useAuth();
-  return !org || !product;
 }
