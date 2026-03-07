@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import {
-  FlatList,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -10,108 +10,52 @@ import { colors, radius, spacing, typography } from "../components/tokens";
 import { EmptyView, ErrorView, LoadingView } from "../components/ui";
 import { useAuth } from "../context/AuthContext";
 import { useOrgProduct } from "../context/OrgProductContext";
-import { useOrgs, useProducts } from "../hooks/useApi";
+import { useAllOrgProducts } from "../hooks/useApi";
 
 export default function OrgProductSelector() {
   const { logout } = useAuth();
   const { selectOrgAndProduct } = useOrgProduct();
-  const [selectedOrg, setSelectedOrg] = useState<string | null>(null);
+  const { data: orgGroups, isLoading, isError, refetch } = useAllOrgProducts();
 
-  const orgsQuery = useOrgs();
-  const productsQuery = useProducts(selectedOrg);
-
-  const handleSelectProduct = (productName: string) => {
-    if (!selectedOrg) return;
-    selectOrgAndProduct(selectedOrg, productName);
-  };
-
-  // ── Org list ───────────────────────────────────────────────────
-  if (!selectedOrg) {
-    if (orgsQuery.isLoading) return <LoadingView message="Loading orgs…" />;
-    if (orgsQuery.isError)
-      return (
-        <ErrorView
-          message="Failed to load organizations"
-          onRetry={() => orgsQuery.refetch()}
-        />
-      );
-
-    const orgs = orgsQuery.data?.data ?? [];
-    if (orgs.length === 0)
-      return <EmptyView title="No Organizations" message="You don't belong to any organizations." />;
-
+  if (isLoading) return <LoadingView message="Loading products…" />;
+  if (isError)
     return (
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Select Organization</Text>
-          <TouchableOpacity onPress={logout}>
-            <Text style={styles.logoutText}>Logout</Text>
-          </TouchableOpacity>
-        </View>
-        <FlatList
-          data={orgs}
-          keyExtractor={(item) => item.name}
-          contentContainerStyle={styles.list}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.card}
-              onPress={() => setSelectedOrg(item.name)}
-            >
-              <Text style={typography.subtitle}>{item.name}</Text>
-              <Text style={styles.arrow}>›</Text>
-            </TouchableOpacity>
-          )}
-        />
-      </View>
+      <ErrorView message="Failed to load products" onRetry={refetch} />
     );
-  }
-
-  // ── Product list ───────────────────────────────────────────────
-  if (productsQuery.isLoading)
-    return <LoadingView message="Loading products…" />;
-  if (productsQuery.isError)
+  if (orgGroups.length === 0)
     return (
-      <ErrorView
-        message="Failed to load products"
-        onRetry={() => productsQuery.refetch()}
+      <EmptyView
+        title="No Products"
+        message="You don't belong to any organizations with products."
       />
     );
-
-  const products = productsQuery.data?.data ?? [];
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => setSelectedOrg(null)}>
-          <Text style={styles.backText}>‹ Back</Text>
+        <Text style={styles.title}>Select Product</Text>
+        <TouchableOpacity onPress={logout}>
+          <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
-        <Text style={styles.breadcrumb}>{selectedOrg}</Text>
       </View>
-      <Text style={[styles.title, { paddingHorizontal: spacing.lg }]}>
-        Select Product
-      </Text>
 
-      {products.length === 0 ? (
-        <EmptyView
-          title="No Products"
-          message="This organization has no products."
-        />
-      ) : (
-        <FlatList
-          data={products}
-          keyExtractor={(item) => String(item.id ?? item.name)}
-          contentContainerStyle={styles.list}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.card}
-              onPress={() => handleSelectProduct(item.name ?? "")}
-            >
-              <Text style={typography.subtitle}>{item.name}</Text>
-              <Text style={styles.arrow}>›</Text>
-            </TouchableOpacity>
-          )}
-        />
-      )}
+      <ScrollView contentContainerStyle={styles.list}>
+        {orgGroups.map((group) => (
+          <View key={group.org} style={styles.orgSection}>
+            <Text style={styles.orgName}>{group.org}</Text>
+            {group.products.map((product) => (
+              <TouchableOpacity
+                key={`${group.org}:${product.name}`}
+                style={styles.card}
+                onPress={() => selectOrgAndProduct(group.org, product.name)}
+              >
+                <Text style={typography.subtitle}>{product.name}</Text>
+                <Text style={styles.arrow}>›</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        ))}
+      </ScrollView>
     </View>
   );
 }
@@ -137,16 +81,20 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.danger,
   },
-  backText: {
-    ...typography.body,
-    color: colors.accent,
-  },
-  breadcrumb: {
-    ...typography.bodySmall,
-    color: colors.accent,
-  },
   list: {
     paddingBottom: spacing.xl,
+  },
+  orgSection: {
+    marginBottom: spacing.md,
+  },
+  orgName: {
+    ...typography.caption,
+    color: colors.textTertiary,
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.xs,
   },
   card: {
     flexDirection: "row",
@@ -158,7 +106,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
     padding: spacing.lg,
     marginHorizontal: spacing.lg,
-    marginVertical: spacing.sm,
+    marginVertical: spacing.xs,
   },
   arrow: {
     ...typography.title,
