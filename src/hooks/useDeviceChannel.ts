@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Channel, Socket } from "phoenix";
 import type { Device, DeviceListResponse } from "../api/generated/schemas";
+import { getListDevicesQueryKey } from "../api/generated/devices/devices";
 import { useAuth } from "../context/AuthContext";
 import { useOrgProduct } from "../context/OrgProductContext";
 
@@ -34,7 +35,7 @@ export function useDeviceChannel() {
 
     // ── Presence diff: toggle online status ───────────────────────
     channel.on("presence_diff", (diff) => {
-      const queryKey = ["orgs", org, "products", product, "devices"];
+      const queryKey = getListDevicesQueryKey(org, product);
 
       queryClient.setQueriesData<DeviceListResponse>(
         { queryKey },
@@ -58,7 +59,7 @@ export function useDeviceChannel() {
 
     // ── Update event: patch firmware_update_status ────────────────
     channel.on("update", (payload) => {
-      const queryKey = ["orgs", org, "products", product, "devices"];
+      const queryKey = getListDevicesQueryKey(org, product);
 
       queryClient.setQueriesData<DeviceListResponse>(
         { queryKey },

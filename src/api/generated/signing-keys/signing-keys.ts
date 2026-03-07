@@ -32,48 +32,24 @@ import type {
 
 import { customInstance } from '../../mutator/custom-instance';
 
-type AwaitedInput<T> = PromiseLike<T> | T;
-
-      type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
-
 
 
 
 /**
  * @summary List signing keys
  */
-export type listSigningKeysResponse200 = {
-  data: SigningKeyListResponse
-  status: 200
-}
-
-export type listSigningKeysResponseSuccess = (listSigningKeysResponse200) & {
-  headers: Headers;
-};
-;
-
-export type listSigningKeysResponse = (listSigningKeysResponseSuccess)
-
-export const getListSigningKeysUrl = (orgName: string,) => {
-
-
+export const listSigningKeys = (
+    orgName: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<SigningKeyListResponse>(
+      {url: `/orgs/${orgName}/keys`, method: 'GET', signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/keys`
-}
-
-export const listSigningKeys = async (orgName: string, options?: RequestInit): Promise<listSigningKeysResponse> => {
-  
-  return customInstance<listSigningKeysResponse>(getListSigningKeysUrl(orgName),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-  
-
 
 
 
@@ -93,7 +69,7 @@ const {query: queryOptions} = options ?? {};
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listSigningKeys>>> = ({ signal }) => listSigningKeys(orgName, { signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listSigningKeys>>> = ({ signal }) => listSigningKeys(orgName, signal);
 
       
 
@@ -152,40 +128,21 @@ export function useListSigningKeys<TData = Awaited<ReturnType<typeof listSigning
 /**
  * @summary Create signing key
  */
-export type createSigningKeyResponse201 = {
-  data: SigningKeyResponse
-  status: 201
-}
-
-export type createSigningKeyResponseSuccess = (createSigningKeyResponse201) & {
-  headers: Headers;
-};
-;
-
-export type createSigningKeyResponse = (createSigningKeyResponseSuccess)
-
-export const getCreateSigningKeyUrl = (orgName: string,) => {
-
-
+export const createSigningKey = (
+    orgName: string,
+    signingKeyCreationRequest: SigningKeyCreationRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<SigningKeyResponse>(
+      {url: `/orgs/${orgName}/keys`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: signingKeyCreationRequest, signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/keys`
-}
-
-export const createSigningKey = async (orgName: string,
-    signingKeyCreationRequest: SigningKeyCreationRequest, options?: RequestInit): Promise<createSigningKeyResponse> => {
-  
-  return customInstance<createSigningKeyResponse>(getCreateSigningKeyUrl(orgName),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      signingKeyCreationRequest,)
-  }
-);}
-  
-
 
 
 export const getCreateSigningKeyMutationOptions = <TError = unknown,
@@ -235,40 +192,19 @@ export const useCreateSigningKey = <TError = unknown,
     /**
  * @summary Get signing key
  */
-export type getSigningKeyResponse200 = {
-  data: SigningKeyResponse
-  status: 200
-}
-
-export type getSigningKeyResponseSuccess = (getSigningKeyResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getSigningKeyResponse = (getSigningKeyResponseSuccess)
-
-export const getGetSigningKeyUrl = (orgName: string,
-    name: string,) => {
-
-
+export const getSigningKey = (
+    orgName: string,
+    name: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<SigningKeyResponse>(
+      {url: `/orgs/${orgName}/keys/${name}`, method: 'GET', signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/keys/${name}`
-}
-
-export const getSigningKey = async (orgName: string,
-    name: string, options?: RequestInit): Promise<getSigningKeyResponse> => {
-  
-  return customInstance<getSigningKeyResponse>(getGetSigningKeyUrl(orgName,name),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-  
-
 
 
 
@@ -290,7 +226,7 @@ const {query: queryOptions} = options ?? {};
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSigningKey>>> = ({ signal }) => getSigningKey(orgName,name, { signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSigningKey>>> = ({ signal }) => getSigningKey(orgName,name, signal);
 
       
 
@@ -353,40 +289,19 @@ export function useGetSigningKey<TData = Awaited<ReturnType<typeof getSigningKey
 /**
  * @summary Delete signing key
  */
-export type deleteSigningKeyResponse204 = {
-  data: void
-  status: 204
-}
-
-export type deleteSigningKeyResponseSuccess = (deleteSigningKeyResponse204) & {
-  headers: Headers;
-};
-;
-
-export type deleteSigningKeyResponse = (deleteSigningKeyResponseSuccess)
-
-export const getDeleteSigningKeyUrl = (orgName: string,
-    name: string,) => {
-
-
+export const deleteSigningKey = (
+    orgName: string,
+    name: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<void>(
+      {url: `/orgs/${orgName}/keys/${name}`, method: 'DELETE', signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/keys/${name}`
-}
-
-export const deleteSigningKey = async (orgName: string,
-    name: string, options?: RequestInit): Promise<deleteSigningKeyResponse> => {
-  
-  return customInstance<deleteSigningKeyResponse>(getDeleteSigningKeyUrl(orgName,name),
-  {      
-    ...options,
-    method: 'DELETE'
-    
-    
-  }
-);}
-  
-
 
 
 export const getDeleteSigningKeyMutationOptions = <TError = unknown,

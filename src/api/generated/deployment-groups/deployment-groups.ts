@@ -33,50 +33,25 @@ import type {
 
 import { customInstance } from '../../mutator/custom-instance';
 
-type AwaitedInput<T> = PromiseLike<T> | T;
-
-      type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
-
 
 
 
 /**
  * @summary List deployment groups
  */
-export type listDeploymentGroupsResponse200 = {
-  data: DeploymentGroupListResponse
-  status: 200
-}
-
-export type listDeploymentGroupsResponseSuccess = (listDeploymentGroupsResponse200) & {
-  headers: Headers;
-};
-;
-
-export type listDeploymentGroupsResponse = (listDeploymentGroupsResponseSuccess)
-
-export const getListDeploymentGroupsUrl = (orgName: string,
-    productName: string,) => {
-
-
+export const listDeploymentGroups = (
+    orgName: string,
+    productName: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<DeploymentGroupListResponse>(
+      {url: `/orgs/${orgName}/products/${productName}/deployments`, method: 'GET', signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/products/${productName}/deployments`
-}
-
-export const listDeploymentGroups = async (orgName: string,
-    productName: string, options?: RequestInit): Promise<listDeploymentGroupsResponse> => {
-  
-  return customInstance<listDeploymentGroupsResponse>(getListDeploymentGroupsUrl(orgName,productName),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-  
-
 
 
 
@@ -98,7 +73,7 @@ const {query: queryOptions} = options ?? {};
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listDeploymentGroups>>> = ({ signal }) => listDeploymentGroups(orgName,productName, { signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listDeploymentGroups>>> = ({ signal }) => listDeploymentGroups(orgName,productName, signal);
 
       
 
@@ -161,42 +136,22 @@ export function useListDeploymentGroups<TData = Awaited<ReturnType<typeof listDe
 /**
  * @summary Create deployment group
  */
-export type createDeploymentGroupResponse201 = {
-  data: DeploymentGroupResponse
-  status: 201
-}
-
-export type createDeploymentGroupResponseSuccess = (createDeploymentGroupResponse201) & {
-  headers: Headers;
-};
-;
-
-export type createDeploymentGroupResponse = (createDeploymentGroupResponseSuccess)
-
-export const getCreateDeploymentGroupUrl = (orgName: string,
-    productName: string,) => {
-
-
-  
-
-  return `/orgs/${orgName}/products/${productName}/deployments`
-}
-
-export const createDeploymentGroup = async (orgName: string,
+export const createDeploymentGroup = (
+    orgName: string,
     productName: string,
-    deploymentGroupCreationRequest: DeploymentGroupCreationRequest, options?: RequestInit): Promise<createDeploymentGroupResponse> => {
+    deploymentGroupCreationRequest: DeploymentGroupCreationRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<DeploymentGroupResponse>(
+      {url: `/orgs/${orgName}/products/${productName}/deployments`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: deploymentGroupCreationRequest, signal
+    },
+      );
+    }
   
-  return customInstance<createDeploymentGroupResponse>(getCreateDeploymentGroupUrl(orgName,productName),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      deploymentGroupCreationRequest,)
-  }
-);}
-  
-
 
 
 export const getCreateDeploymentGroupMutationOptions = <TError = unknown,
@@ -246,42 +201,20 @@ export const useCreateDeploymentGroup = <TError = unknown,
     /**
  * @summary Get deployment group
  */
-export type getDeploymentGroupResponse200 = {
-  data: DeploymentGroupResponse
-  status: 200
-}
-
-export type getDeploymentGroupResponseSuccess = (getDeploymentGroupResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getDeploymentGroupResponse = (getDeploymentGroupResponseSuccess)
-
-export const getGetDeploymentGroupUrl = (orgName: string,
+export const getDeploymentGroup = (
+    orgName: string,
     productName: string,
-    name: string,) => {
-
-
+    name: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<DeploymentGroupResponse>(
+      {url: `/orgs/${orgName}/products/${productName}/deployments/${name}`, method: 'GET', signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/products/${productName}/deployments/${name}`
-}
-
-export const getDeploymentGroup = async (orgName: string,
-    productName: string,
-    name: string, options?: RequestInit): Promise<getDeploymentGroupResponse> => {
-  
-  return customInstance<getDeploymentGroupResponse>(getGetDeploymentGroupUrl(orgName,productName,name),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-  
-
 
 
 
@@ -305,7 +238,7 @@ const {query: queryOptions} = options ?? {};
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDeploymentGroup>>> = ({ signal }) => getDeploymentGroup(orgName,productName,name, { signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDeploymentGroup>>> = ({ signal }) => getDeploymentGroup(orgName,productName,name, signal);
 
       
 
@@ -372,44 +305,23 @@ export function useGetDeploymentGroup<TData = Awaited<ReturnType<typeof getDeplo
 /**
  * @summary Update deployment group
  */
-export type updateDeploymentGroupResponse200 = {
-  data: DeploymentGroupResponse
-  status: 200
-}
-
-export type updateDeploymentGroupResponseSuccess = (updateDeploymentGroupResponse200) & {
-  headers: Headers;
-};
-;
-
-export type updateDeploymentGroupResponse = (updateDeploymentGroupResponseSuccess)
-
-export const getUpdateDeploymentGroupUrl = (orgName: string,
-    productName: string,
-    name: string,) => {
-
-
-  
-
-  return `/orgs/${orgName}/products/${productName}/deployments/${name}`
-}
-
-export const updateDeploymentGroup = async (orgName: string,
+export const updateDeploymentGroup = (
+    orgName: string,
     productName: string,
     name: string,
-    deploymentGroupUpdateRequest: DeploymentGroupUpdateRequest, options?: RequestInit): Promise<updateDeploymentGroupResponse> => {
+    deploymentGroupUpdateRequest: DeploymentGroupUpdateRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<DeploymentGroupResponse>(
+      {url: `/orgs/${orgName}/products/${productName}/deployments/${name}`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: deploymentGroupUpdateRequest, signal
+    },
+      );
+    }
   
-  return customInstance<updateDeploymentGroupResponse>(getUpdateDeploymentGroupUrl(orgName,productName,name),
-  {      
-    ...options,
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      deploymentGroupUpdateRequest,)
-  }
-);}
-  
-
 
 
 export const getUpdateDeploymentGroupMutationOptions = <TError = unknown,
@@ -459,42 +371,20 @@ export const useUpdateDeploymentGroup = <TError = unknown,
     /**
  * @summary Delete deployment group
  */
-export type deleteDeploymentGroupResponse204 = {
-  data: void
-  status: 204
-}
-
-export type deleteDeploymentGroupResponseSuccess = (deleteDeploymentGroupResponse204) & {
-  headers: Headers;
-};
-;
-
-export type deleteDeploymentGroupResponse = (deleteDeploymentGroupResponseSuccess)
-
-export const getDeleteDeploymentGroupUrl = (orgName: string,
+export const deleteDeploymentGroup = (
+    orgName: string,
     productName: string,
-    name: string,) => {
-
-
+    name: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<void>(
+      {url: `/orgs/${orgName}/products/${productName}/deployments/${name}`, method: 'DELETE', signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/products/${productName}/deployments/${name}`
-}
-
-export const deleteDeploymentGroup = async (orgName: string,
-    productName: string,
-    name: string, options?: RequestInit): Promise<deleteDeploymentGroupResponse> => {
-  
-  return customInstance<deleteDeploymentGroupResponse>(getDeleteDeploymentGroupUrl(orgName,productName,name),
-  {      
-    ...options,
-    method: 'DELETE'
-    
-    
-  }
-);}
-  
-
 
 
 export const getDeleteDeploymentGroupMutationOptions = <TError = unknown,

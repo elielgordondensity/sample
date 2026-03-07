@@ -32,52 +32,26 @@ import type {
 
 import { customInstance } from '../../mutator/custom-instance';
 
-type AwaitedInput<T> = PromiseLike<T> | T;
-
-      type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
-
 
 
 
 /**
  * @summary List device certificates
  */
-export type listDeviceCertificatesResponse200 = {
-  data: DeviceCertificateListResponse
-  status: 200
-}
-
-export type listDeviceCertificatesResponseSuccess = (listDeviceCertificatesResponse200) & {
-  headers: Headers;
-};
-;
-
-export type listDeviceCertificatesResponse = (listDeviceCertificatesResponseSuccess)
-
-export const getListDeviceCertificatesUrl = (orgName: string,
+export const listDeviceCertificates = (
+    orgName: string,
     productName: string,
-    identifier: string,) => {
-
-
+    identifier: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<DeviceCertificateListResponse>(
+      {url: `/orgs/${orgName}/products/${productName}/devices/${identifier}/certificates`, method: 'GET', signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/products/${productName}/devices/${identifier}/certificates`
-}
-
-export const listDeviceCertificates = async (orgName: string,
-    productName: string,
-    identifier: string, options?: RequestInit): Promise<listDeviceCertificatesResponse> => {
-  
-  return customInstance<listDeviceCertificatesResponse>(getListDeviceCertificatesUrl(orgName,productName,identifier),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-  
-
 
 
 
@@ -101,7 +75,7 @@ const {query: queryOptions} = options ?? {};
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listDeviceCertificates>>> = ({ signal }) => listDeviceCertificates(orgName,productName,identifier, { signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listDeviceCertificates>>> = ({ signal }) => listDeviceCertificates(orgName,productName,identifier, signal);
 
       
 
@@ -168,44 +142,23 @@ export function useListDeviceCertificates<TData = Awaited<ReturnType<typeof list
 /**
  * @summary Create device certificate
  */
-export type createDeviceCertificateResponse201 = {
-  data: DeviceCertificateResponse
-  status: 201
-}
-
-export type createDeviceCertificateResponseSuccess = (createDeviceCertificateResponse201) & {
-  headers: Headers;
-};
-;
-
-export type createDeviceCertificateResponse = (createDeviceCertificateResponseSuccess)
-
-export const getCreateDeviceCertificateUrl = (orgName: string,
-    productName: string,
-    identifier: string,) => {
-
-
-  
-
-  return `/orgs/${orgName}/products/${productName}/devices/${identifier}/certificates`
-}
-
-export const createDeviceCertificate = async (orgName: string,
+export const createDeviceCertificate = (
+    orgName: string,
     productName: string,
     identifier: string,
-    createDeviceCertificateBody: CreateDeviceCertificateBody, options?: RequestInit): Promise<createDeviceCertificateResponse> => {
+    createDeviceCertificateBody: CreateDeviceCertificateBody,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<DeviceCertificateResponse>(
+      {url: `/orgs/${orgName}/products/${productName}/devices/${identifier}/certificates`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: createDeviceCertificateBody, signal
+    },
+      );
+    }
   
-  return customInstance<createDeviceCertificateResponse>(getCreateDeviceCertificateUrl(orgName,productName,identifier),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      createDeviceCertificateBody,)
-  }
-);}
-  
-
 
 
 export const getCreateDeviceCertificateMutationOptions = <TError = unknown,
@@ -255,44 +208,21 @@ export const useCreateDeviceCertificate = <TError = unknown,
     /**
  * @summary Get device certificate
  */
-export type getDeviceCertificateResponse200 = {
-  data: DeviceCertificateResponse
-  status: 200
-}
-
-export type getDeviceCertificateResponseSuccess = (getDeviceCertificateResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getDeviceCertificateResponse = (getDeviceCertificateResponseSuccess)
-
-export const getGetDeviceCertificateUrl = (orgName: string,
+export const getDeviceCertificate = (
+    orgName: string,
     productName: string,
     identifier: string,
-    serial: string,) => {
-
-
+    serial: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<DeviceCertificateResponse>(
+      {url: `/orgs/${orgName}/products/${productName}/devices/${identifier}/certificates/${serial}`, method: 'GET', signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/products/${productName}/devices/${identifier}/certificates/${serial}`
-}
-
-export const getDeviceCertificate = async (orgName: string,
-    productName: string,
-    identifier: string,
-    serial: string, options?: RequestInit): Promise<getDeviceCertificateResponse> => {
-  
-  return customInstance<getDeviceCertificateResponse>(getGetDeviceCertificateUrl(orgName,productName,identifier,serial),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-  
-
 
 
 
@@ -318,7 +248,7 @@ const {query: queryOptions} = options ?? {};
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDeviceCertificate>>> = ({ signal }) => getDeviceCertificate(orgName,productName,identifier,serial, { signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDeviceCertificate>>> = ({ signal }) => getDeviceCertificate(orgName,productName,identifier,serial, signal);
 
       
 
@@ -389,44 +319,21 @@ export function useGetDeviceCertificate<TData = Awaited<ReturnType<typeof getDev
 /**
  * @summary Delete device certificate
  */
-export type deleteDeviceCertificateResponse204 = {
-  data: void
-  status: 204
-}
-
-export type deleteDeviceCertificateResponseSuccess = (deleteDeviceCertificateResponse204) & {
-  headers: Headers;
-};
-;
-
-export type deleteDeviceCertificateResponse = (deleteDeviceCertificateResponseSuccess)
-
-export const getDeleteDeviceCertificateUrl = (orgName: string,
+export const deleteDeviceCertificate = (
+    orgName: string,
     productName: string,
     identifier: string,
-    serial: string,) => {
-
-
+    serial: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<void>(
+      {url: `/orgs/${orgName}/products/${productName}/devices/${identifier}/certificates/${serial}`, method: 'DELETE', signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/products/${productName}/devices/${identifier}/certificates/${serial}`
-}
-
-export const deleteDeviceCertificate = async (orgName: string,
-    productName: string,
-    identifier: string,
-    serial: string, options?: RequestInit): Promise<deleteDeviceCertificateResponse> => {
-  
-  return customInstance<deleteDeviceCertificateResponse>(getDeleteDeviceCertificateUrl(orgName,productName,identifier,serial),
-  {      
-    ...options,
-    method: 'DELETE'
-    
-    
-  }
-);}
-  
-
 
 
 export const getDeleteDeviceCertificateMutationOptions = <TError = unknown,

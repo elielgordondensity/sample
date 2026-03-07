@@ -30,50 +30,25 @@ import type {
 
 import { customInstance } from '../../mutator/custom-instance';
 
-type AwaitedInput<T> = PromiseLike<T> | T;
-
-      type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
-
 
 
 
 /**
  * @summary List support scripts
  */
-export type listScriptsResponse200 = {
-  data: ScriptListResponse
-  status: 200
-}
-
-export type listScriptsResponseSuccess = (listScriptsResponse200) & {
-  headers: Headers;
-};
-;
-
-export type listScriptsResponse = (listScriptsResponseSuccess)
-
-export const getListScriptsUrl = (orgName: string,
-    productName: string,) => {
-
-
+export const listScripts = (
+    orgName: string,
+    productName: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<ScriptListResponse>(
+      {url: `/orgs/${orgName}/products/${productName}/scripts`, method: 'GET', signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/products/${productName}/scripts`
-}
-
-export const listScripts = async (orgName: string,
-    productName: string, options?: RequestInit): Promise<listScriptsResponse> => {
-  
-  return customInstance<listScriptsResponse>(getListScriptsUrl(orgName,productName),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-  
-
 
 
 
@@ -95,7 +70,7 @@ const {query: queryOptions} = options ?? {};
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listScripts>>> = ({ signal }) => listScripts(orgName,productName, { signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listScripts>>> = ({ signal }) => listScripts(orgName,productName, signal);
 
       
 
@@ -158,44 +133,21 @@ export function useListScripts<TData = Awaited<ReturnType<typeof listScripts>>, 
 /**
  * @summary Execute script on device
  */
-export type executeScriptResponse200 = {
-  data: void
-  status: 200
-}
-
-export type executeScriptResponseSuccess = (executeScriptResponse200) & {
-  headers: Headers;
-};
-;
-
-export type executeScriptResponse = (executeScriptResponseSuccess)
-
-export const getExecuteScriptUrl = (orgName: string,
+export const executeScript = (
+    orgName: string,
     productName: string,
     identifier: string,
-    nameOrId: string,) => {
-
-
+    nameOrId: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<void>(
+      {url: `/orgs/${orgName}/products/${productName}/devices/${identifier}/scripts/${nameOrId}`, method: 'POST', signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/products/${productName}/devices/${identifier}/scripts/${nameOrId}`
-}
-
-export const executeScript = async (orgName: string,
-    productName: string,
-    identifier: string,
-    nameOrId: string, options?: RequestInit): Promise<executeScriptResponse> => {
-  
-  return customInstance<executeScriptResponse>(getExecuteScriptUrl(orgName,productName,identifier,nameOrId),
-  {      
-    ...options,
-    method: 'POST'
-    
-    
-  }
-);}
-  
-
 
 
 export const getExecuteScriptMutationOptions = <TError = unknown,
@@ -245,40 +197,19 @@ export const useExecuteScript = <TError = unknown,
     /**
  * @summary Execute script on device (short URL)
  */
-export type executeScriptShortResponse200 = {
-  data: void
-  status: 200
-}
-
-export type executeScriptShortResponseSuccess = (executeScriptShortResponse200) & {
-  headers: Headers;
-};
-;
-
-export type executeScriptShortResponse = (executeScriptShortResponseSuccess)
-
-export const getExecuteScriptShortUrl = (identifier: string,
-    nameOrId: string,) => {
-
-
+export const executeScriptShort = (
+    identifier: string,
+    nameOrId: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<void>(
+      {url: `/devices/${identifier}/scripts/${nameOrId}`, method: 'POST', signal
+    },
+      );
+    }
   
-
-  return `/devices/${identifier}/scripts/${nameOrId}`
-}
-
-export const executeScriptShort = async (identifier: string,
-    nameOrId: string, options?: RequestInit): Promise<executeScriptShortResponse> => {
-  
-  return customInstance<executeScriptShortResponse>(getExecuteScriptShortUrl(identifier,nameOrId),
-  {      
-    ...options,
-    method: 'POST'
-    
-    
-  }
-);}
-  
-
 
 
 export const getExecuteScriptShortMutationOptions = <TError = unknown,

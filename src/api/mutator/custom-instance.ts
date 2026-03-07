@@ -28,8 +28,7 @@ export const resetAxios = () => {
  * instead of a raw Axios call.
  */
 export const customInstance = <T>(config: AxiosRequestConfig): Promise<T> => {
-  const promise = AXIOS_INSTANCE(config).then(({ data }) => data);
-  return promise;
+  return AXIOS_INSTANCE(config).then(({ data }) => data);
 };
 
 export default customInstance;

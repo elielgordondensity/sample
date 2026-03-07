@@ -22,56 +22,26 @@ import type {
 
 import { customInstance } from '../../mutator/custom-instance';
 
-type AwaitedInput<T> = PromiseLike<T> | T;
-
-      type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
-
 
 
 
 /**
  * @summary Authenticate user
  */
-export type authUserResponse200 = {
-  data: AuthResponse
-  status: 200
-}
-
-export type authUserResponse401 = {
-  data: void
-  status: 401
-}
-
-export type authUserResponseSuccess = (authUserResponse200) & {
-  headers: Headers;
-};
-export type authUserResponseError = (authUserResponse401) & {
-  headers: Headers;
-};
-
-export type authUserResponse = (authUserResponseSuccess | authUserResponseError)
-
-export const getAuthUserUrl = () => {
-
-
+export const authUser = (
+    authRequest: AuthRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<AuthResponse>(
+      {url: `/users/auth`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: authRequest, signal
+    },
+      );
+    }
   
-
-  return `/users/auth`
-}
-
-export const authUser = async (authRequest: AuthRequest, options?: RequestInit): Promise<authUserResponse> => {
-  
-  return customInstance<authUserResponse>(getAuthUserUrl(),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      authRequest,)
-  }
-);}
-  
-
 
 
 export const getAuthUserMutationOptions = <TError = void,
@@ -121,46 +91,20 @@ export const useAuthUser = <TError = void,
     /**
  * @summary Login user
  */
-export type loginUserResponse200 = {
-  data: AuthResponse
-  status: 200
-}
-
-export type loginUserResponse401 = {
-  data: void
-  status: 401
-}
-
-export type loginUserResponseSuccess = (loginUserResponse200) & {
-  headers: Headers;
-};
-export type loginUserResponseError = (loginUserResponse401) & {
-  headers: Headers;
-};
-
-export type loginUserResponse = (loginUserResponseSuccess | loginUserResponseError)
-
-export const getLoginUserUrl = () => {
-
-
+export const loginUser = (
+    authRequest: AuthRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<AuthResponse>(
+      {url: `/users/login`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: authRequest, signal
+    },
+      );
+    }
   
-
-  return `/users/login`
-}
-
-export const loginUser = async (authRequest: AuthRequest, options?: RequestInit): Promise<loginUserResponse> => {
-  
-  return customInstance<loginUserResponse>(getLoginUserUrl(),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      authRequest,)
-  }
-);}
-  
-
 
 
 export const getLoginUserMutationOptions = <TError = void,

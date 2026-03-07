@@ -32,48 +32,24 @@ import type {
 
 import { customInstance } from '../../mutator/custom-instance';
 
-type AwaitedInput<T> = PromiseLike<T> | T;
-
-      type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
-
 
 
 
 /**
  * @summary List products
  */
-export type listProductsResponse200 = {
-  data: ProductListResponse
-  status: 200
-}
-
-export type listProductsResponseSuccess = (listProductsResponse200) & {
-  headers: Headers;
-};
-;
-
-export type listProductsResponse = (listProductsResponseSuccess)
-
-export const getListProductsUrl = (orgName: string,) => {
-
-
+export const listProducts = (
+    orgName: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<ProductListResponse>(
+      {url: `/orgs/${orgName}/products`, method: 'GET', signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/products`
-}
-
-export const listProducts = async (orgName: string, options?: RequestInit): Promise<listProductsResponse> => {
-  
-  return customInstance<listProductsResponse>(getListProductsUrl(orgName),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-  
-
 
 
 
@@ -93,7 +69,7 @@ const {query: queryOptions} = options ?? {};
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listProducts>>> = ({ signal }) => listProducts(orgName, { signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listProducts>>> = ({ signal }) => listProducts(orgName, signal);
 
       
 
@@ -152,40 +128,21 @@ export function useListProducts<TData = Awaited<ReturnType<typeof listProducts>>
 /**
  * @summary Create product
  */
-export type createProductResponse201 = {
-  data: ProductResponse
-  status: 201
-}
-
-export type createProductResponseSuccess = (createProductResponse201) & {
-  headers: Headers;
-};
-;
-
-export type createProductResponse = (createProductResponseSuccess)
-
-export const getCreateProductUrl = (orgName: string,) => {
-
-
+export const createProduct = (
+    orgName: string,
+    productCreationRequest: ProductCreationRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<ProductResponse>(
+      {url: `/orgs/${orgName}/products`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: productCreationRequest, signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/products`
-}
-
-export const createProduct = async (orgName: string,
-    productCreationRequest: ProductCreationRequest, options?: RequestInit): Promise<createProductResponse> => {
-  
-  return customInstance<createProductResponse>(getCreateProductUrl(orgName),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      productCreationRequest,)
-  }
-);}
-  
-
 
 
 export const getCreateProductMutationOptions = <TError = unknown,
@@ -235,40 +192,19 @@ export const useCreateProduct = <TError = unknown,
     /**
  * @summary Get product
  */
-export type getProductResponse200 = {
-  data: ProductResponse
-  status: 200
-}
-
-export type getProductResponseSuccess = (getProductResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getProductResponse = (getProductResponseSuccess)
-
-export const getGetProductUrl = (orgName: string,
-    productName: string,) => {
-
-
+export const getProduct = (
+    orgName: string,
+    productName: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<ProductResponse>(
+      {url: `/orgs/${orgName}/products/${productName}`, method: 'GET', signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/products/${productName}`
-}
-
-export const getProduct = async (orgName: string,
-    productName: string, options?: RequestInit): Promise<getProductResponse> => {
-  
-  return customInstance<getProductResponse>(getGetProductUrl(orgName,productName),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-  
-
 
 
 
@@ -290,7 +226,7 @@ const {query: queryOptions} = options ?? {};
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getProduct>>> = ({ signal }) => getProduct(orgName,productName, { signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getProduct>>> = ({ signal }) => getProduct(orgName,productName, signal);
 
       
 
@@ -353,40 +289,19 @@ export function useGetProduct<TData = Awaited<ReturnType<typeof getProduct>>, TE
 /**
  * @summary Delete product
  */
-export type deleteProductResponse204 = {
-  data: void
-  status: 204
-}
-
-export type deleteProductResponseSuccess = (deleteProductResponse204) & {
-  headers: Headers;
-};
-;
-
-export type deleteProductResponse = (deleteProductResponseSuccess)
-
-export const getDeleteProductUrl = (orgName: string,
-    productName: string,) => {
-
-
+export const deleteProduct = (
+    orgName: string,
+    productName: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<void>(
+      {url: `/orgs/${orgName}/products/${productName}`, method: 'DELETE', signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/products/${productName}`
-}
-
-export const deleteProduct = async (orgName: string,
-    productName: string, options?: RequestInit): Promise<deleteProductResponse> => {
-  
-  return customInstance<deleteProductResponse>(getDeleteProductUrl(orgName,productName),
-  {      
-    ...options,
-    method: 'DELETE'
-    
-    
-  }
-);}
-  
-
 
 
 export const getDeleteProductMutationOptions = <TError = unknown,

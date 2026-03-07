@@ -39,59 +39,27 @@ import type {
 
 import { customInstance } from '../../mutator/custom-instance';
 
-type AwaitedInput<T> = PromiseLike<T> | T;
-
-      type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
-
 
 
 
 /**
  * @summary List devices
  */
-export type listDevicesResponse200 = {
-  data: DeviceListResponse
-  status: 200
-}
-
-export type listDevicesResponseSuccess = (listDevicesResponse200) & {
-  headers: Headers;
-};
-;
-
-export type listDevicesResponse = (listDevicesResponseSuccess)
-
-export const getListDevicesUrl = (orgName: string,
+export const listDevices = (
+    orgName: string,
     productName: string,
-    params?: ListDevicesParams,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    params?: ListDevicesParams,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<DeviceListResponse>(
+      {url: `/orgs/${orgName}/products/${productName}/devices`, method: 'GET',
+        params, signal
+    },
+      );
     }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `/orgs/${orgName}/products/${productName}/devices?${stringifiedParams}` : `/orgs/${orgName}/products/${productName}/devices`
-}
-
-export const listDevices = async (orgName: string,
-    productName: string,
-    params?: ListDevicesParams, options?: RequestInit): Promise<listDevicesResponse> => {
   
-  return customInstance<listDevicesResponse>(getListDevicesUrl(orgName,productName,params),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-  
-
 
 
 
@@ -115,7 +83,7 @@ const {query: queryOptions} = options ?? {};
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listDevices>>> = ({ signal }) => listDevices(orgName,productName,params, { signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listDevices>>> = ({ signal }) => listDevices(orgName,productName,params, signal);
 
       
 
@@ -182,42 +150,22 @@ export function useListDevices<TData = Awaited<ReturnType<typeof listDevices>>, 
 /**
  * @summary Create device
  */
-export type createDeviceResponse204 = {
-  data: DeviceResponse
-  status: 204
-}
-
-export type createDeviceResponseSuccess = (createDeviceResponse204) & {
-  headers: Headers;
-};
-;
-
-export type createDeviceResponse = (createDeviceResponseSuccess)
-
-export const getCreateDeviceUrl = (orgName: string,
-    productName: string,) => {
-
-
-  
-
-  return `/orgs/${orgName}/products/${productName}/devices`
-}
-
-export const createDevice = async (orgName: string,
+export const createDevice = (
+    orgName: string,
     productName: string,
-    deviceCreationRequest: DeviceCreationRequest, options?: RequestInit): Promise<createDeviceResponse> => {
+    deviceCreationRequest: DeviceCreationRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<DeviceResponse>(
+      {url: `/orgs/${orgName}/products/${productName}/devices`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: deviceCreationRequest, signal
+    },
+      );
+    }
   
-  return customInstance<createDeviceResponse>(getCreateDeviceUrl(orgName,productName),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      deviceCreationRequest,)
-  }
-);}
-  
-
 
 
 export const getCreateDeviceMutationOptions = <TError = unknown,
@@ -267,42 +215,22 @@ export const useCreateDevice = <TError = unknown,
     /**
  * @summary Validate device certificate auth
  */
-export type authDeviceResponse200 = {
-  data: DeviceResponse
-  status: 200
-}
-
-export type authDeviceResponseSuccess = (authDeviceResponse200) & {
-  headers: Headers;
-};
-;
-
-export type authDeviceResponse = (authDeviceResponseSuccess)
-
-export const getAuthDeviceUrl = (orgName: string,
-    productName: string,) => {
-
-
-  
-
-  return `/orgs/${orgName}/products/${productName}/devices/auth`
-}
-
-export const authDevice = async (orgName: string,
+export const authDevice = (
+    orgName: string,
     productName: string,
-    deviceCertificateAuthRequest: DeviceCertificateAuthRequest, options?: RequestInit): Promise<authDeviceResponse> => {
+    deviceCertificateAuthRequest: DeviceCertificateAuthRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<DeviceResponse>(
+      {url: `/orgs/${orgName}/products/${productName}/devices/auth`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: deviceCertificateAuthRequest, signal
+    },
+      );
+    }
   
-  return customInstance<authDeviceResponse>(getAuthDeviceUrl(orgName,productName),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      deviceCertificateAuthRequest,)
-  }
-);}
-  
-
 
 
 export const getAuthDeviceMutationOptions = <TError = unknown,
@@ -352,42 +280,20 @@ export const useAuthDevice = <TError = unknown,
     /**
  * @summary Get device
  */
-export type getDeviceResponse200 = {
-  data: DeviceResponse
-  status: 200
-}
-
-export type getDeviceResponseSuccess = (getDeviceResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getDeviceResponse = (getDeviceResponseSuccess)
-
-export const getGetDeviceUrl = (orgName: string,
+export const getDevice = (
+    orgName: string,
     productName: string,
-    identifier: string,) => {
-
-
+    identifier: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<DeviceResponse>(
+      {url: `/orgs/${orgName}/products/${productName}/devices/${identifier}`, method: 'GET', signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/products/${productName}/devices/${identifier}`
-}
-
-export const getDevice = async (orgName: string,
-    productName: string,
-    identifier: string, options?: RequestInit): Promise<getDeviceResponse> => {
-  
-  return customInstance<getDeviceResponse>(getGetDeviceUrl(orgName,productName,identifier),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-  
-
 
 
 
@@ -411,7 +317,7 @@ const {query: queryOptions} = options ?? {};
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDevice>>> = ({ signal }) => getDevice(orgName,productName,identifier, { signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDevice>>> = ({ signal }) => getDevice(orgName,productName,identifier, signal);
 
       
 
@@ -478,44 +384,23 @@ export function useGetDevice<TData = Awaited<ReturnType<typeof getDevice>>, TErr
 /**
  * @summary Update device
  */
-export type updateDeviceResponse200 = {
-  data: DeviceResponse
-  status: 200
-}
-
-export type updateDeviceResponseSuccess = (updateDeviceResponse200) & {
-  headers: Headers;
-};
-;
-
-export type updateDeviceResponse = (updateDeviceResponseSuccess)
-
-export const getUpdateDeviceUrl = (orgName: string,
-    productName: string,
-    identifier: string,) => {
-
-
-  
-
-  return `/orgs/${orgName}/products/${productName}/devices/${identifier}`
-}
-
-export const updateDevice = async (orgName: string,
+export const updateDevice = (
+    orgName: string,
     productName: string,
     identifier: string,
-    deviceUpdateRequest: DeviceUpdateRequest, options?: RequestInit): Promise<updateDeviceResponse> => {
+    deviceUpdateRequest: DeviceUpdateRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<DeviceResponse>(
+      {url: `/orgs/${orgName}/products/${productName}/devices/${identifier}`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: deviceUpdateRequest, signal
+    },
+      );
+    }
   
-  return customInstance<updateDeviceResponse>(getUpdateDeviceUrl(orgName,productName,identifier),
-  {      
-    ...options,
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      deviceUpdateRequest,)
-  }
-);}
-  
-
 
 
 export const getUpdateDeviceMutationOptions = <TError = unknown,
@@ -565,42 +450,20 @@ export const useUpdateDevice = <TError = unknown,
     /**
  * @summary Delete device
  */
-export type deleteDeviceResponse204 = {
-  data: void
-  status: 204
-}
-
-export type deleteDeviceResponseSuccess = (deleteDeviceResponse204) & {
-  headers: Headers;
-};
-;
-
-export type deleteDeviceResponse = (deleteDeviceResponseSuccess)
-
-export const getDeleteDeviceUrl = (orgName: string,
+export const deleteDevice = (
+    orgName: string,
     productName: string,
-    identifier: string,) => {
-
-
+    identifier: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<void>(
+      {url: `/orgs/${orgName}/products/${productName}/devices/${identifier}`, method: 'DELETE', signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/products/${productName}/devices/${identifier}`
-}
-
-export const deleteDevice = async (orgName: string,
-    productName: string,
-    identifier: string, options?: RequestInit): Promise<deleteDeviceResponse> => {
-  
-  return customInstance<deleteDeviceResponse>(getDeleteDeviceUrl(orgName,productName,identifier),
-  {      
-    ...options,
-    method: 'DELETE'
-    
-    
-  }
-);}
-  
-
 
 
 export const getDeleteDeviceMutationOptions = <TError = unknown,
@@ -650,42 +513,20 @@ export const useDeleteDevice = <TError = unknown,
     /**
  * @summary Reboot device
  */
-export type rebootDeviceResponse200 = {
-  data: void
-  status: 200
-}
-
-export type rebootDeviceResponseSuccess = (rebootDeviceResponse200) & {
-  headers: Headers;
-};
-;
-
-export type rebootDeviceResponse = (rebootDeviceResponseSuccess)
-
-export const getRebootDeviceUrl = (orgName: string,
+export const rebootDevice = (
+    orgName: string,
     productName: string,
-    identifier: string,) => {
-
-
+    identifier: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<void>(
+      {url: `/orgs/${orgName}/products/${productName}/devices/${identifier}/reboot`, method: 'POST', signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/products/${productName}/devices/${identifier}/reboot`
-}
-
-export const rebootDevice = async (orgName: string,
-    productName: string,
-    identifier: string, options?: RequestInit): Promise<rebootDeviceResponse> => {
-  
-  return customInstance<rebootDeviceResponse>(getRebootDeviceUrl(orgName,productName,identifier),
-  {      
-    ...options,
-    method: 'POST'
-    
-    
-  }
-);}
-  
-
 
 
 export const getRebootDeviceMutationOptions = <TError = unknown,
@@ -735,42 +576,20 @@ export const useRebootDevice = <TError = unknown,
     /**
  * @summary Reconnect device
  */
-export type reconnectDeviceResponse200 = {
-  data: void
-  status: 200
-}
-
-export type reconnectDeviceResponseSuccess = (reconnectDeviceResponse200) & {
-  headers: Headers;
-};
-;
-
-export type reconnectDeviceResponse = (reconnectDeviceResponseSuccess)
-
-export const getReconnectDeviceUrl = (orgName: string,
+export const reconnectDevice = (
+    orgName: string,
     productName: string,
-    identifier: string,) => {
-
-
+    identifier: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<void>(
+      {url: `/orgs/${orgName}/products/${productName}/devices/${identifier}/reconnect`, method: 'POST', signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/products/${productName}/devices/${identifier}/reconnect`
-}
-
-export const reconnectDevice = async (orgName: string,
-    productName: string,
-    identifier: string, options?: RequestInit): Promise<reconnectDeviceResponse> => {
-  
-  return customInstance<reconnectDeviceResponse>(getReconnectDeviceUrl(orgName,productName,identifier),
-  {      
-    ...options,
-    method: 'POST'
-    
-    
-  }
-);}
-  
-
 
 
 export const getReconnectDeviceMutationOptions = <TError = unknown,
@@ -820,44 +639,23 @@ export const useReconnectDevice = <TError = unknown,
     /**
  * @summary Execute code on device
  */
-export type executeDeviceCodeResponse200 = {
-  data: void
-  status: 200
-}
-
-export type executeDeviceCodeResponseSuccess = (executeDeviceCodeResponse200) & {
-  headers: Headers;
-};
-;
-
-export type executeDeviceCodeResponse = (executeDeviceCodeResponseSuccess)
-
-export const getExecuteDeviceCodeUrl = (orgName: string,
-    productName: string,
-    identifier: string,) => {
-
-
-  
-
-  return `/orgs/${orgName}/products/${productName}/devices/${identifier}/code`
-}
-
-export const executeDeviceCode = async (orgName: string,
+export const executeDeviceCode = (
+    orgName: string,
     productName: string,
     identifier: string,
-    executeDeviceCodeBody: ExecuteDeviceCodeBody, options?: RequestInit): Promise<executeDeviceCodeResponse> => {
+    executeDeviceCodeBody: ExecuteDeviceCodeBody,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<void>(
+      {url: `/orgs/${orgName}/products/${productName}/devices/${identifier}/code`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: executeDeviceCodeBody, signal
+    },
+      );
+    }
   
-  return customInstance<executeDeviceCodeResponse>(getExecuteDeviceCodeUrl(orgName,productName,identifier),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      executeDeviceCodeBody,)
-  }
-);}
-  
-
 
 
 export const getExecuteDeviceCodeMutationOptions = <TError = unknown,
@@ -907,42 +705,20 @@ export const useExecuteDeviceCode = <TError = unknown,
     /**
  * @summary Trigger firmware upgrade on device
  */
-export type upgradeDeviceResponse200 = {
-  data: void
-  status: 200
-}
-
-export type upgradeDeviceResponseSuccess = (upgradeDeviceResponse200) & {
-  headers: Headers;
-};
-;
-
-export type upgradeDeviceResponse = (upgradeDeviceResponseSuccess)
-
-export const getUpgradeDeviceUrl = (orgName: string,
+export const upgradeDevice = (
+    orgName: string,
     productName: string,
-    identifier: string,) => {
-
-
+    identifier: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<void>(
+      {url: `/orgs/${orgName}/products/${productName}/devices/${identifier}/upgrade`, method: 'POST', signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/products/${productName}/devices/${identifier}/upgrade`
-}
-
-export const upgradeDevice = async (orgName: string,
-    productName: string,
-    identifier: string, options?: RequestInit): Promise<upgradeDeviceResponse> => {
-  
-  return customInstance<upgradeDeviceResponse>(getUpgradeDeviceUrl(orgName,productName,identifier),
-  {      
-    ...options,
-    method: 'POST'
-    
-    
-  }
-);}
-  
-
 
 
 export const getUpgradeDeviceMutationOptions = <TError = unknown,
@@ -992,44 +768,23 @@ export const useUpgradeDevice = <TError = unknown,
     /**
  * @summary Move device to another product
  */
-export type moveDeviceResponse200 = {
-  data: void
-  status: 200
-}
-
-export type moveDeviceResponseSuccess = (moveDeviceResponse200) & {
-  headers: Headers;
-};
-;
-
-export type moveDeviceResponse = (moveDeviceResponseSuccess)
-
-export const getMoveDeviceUrl = (orgName: string,
-    productName: string,
-    identifier: string,) => {
-
-
-  
-
-  return `/orgs/${orgName}/products/${productName}/devices/${identifier}/move`
-}
-
-export const moveDevice = async (orgName: string,
+export const moveDevice = (
+    orgName: string,
     productName: string,
     identifier: string,
-    moveDeviceBody: MoveDeviceBody, options?: RequestInit): Promise<moveDeviceResponse> => {
+    moveDeviceBody: MoveDeviceBody,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<void>(
+      {url: `/orgs/${orgName}/products/${productName}/devices/${identifier}/move`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: moveDeviceBody, signal
+    },
+      );
+    }
   
-  return customInstance<moveDeviceResponse>(getMoveDeviceUrl(orgName,productName,identifier),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      moveDeviceBody,)
-  }
-);}
-  
-
 
 
 export const getMoveDeviceMutationOptions = <TError = unknown,
@@ -1079,42 +834,20 @@ export const useMoveDevice = <TError = unknown,
     /**
  * @summary Clear device penalty
  */
-export type clearDevicePenaltyResponse200 = {
-  data: void
-  status: 200
-}
-
-export type clearDevicePenaltyResponseSuccess = (clearDevicePenaltyResponse200) & {
-  headers: Headers;
-};
-;
-
-export type clearDevicePenaltyResponse = (clearDevicePenaltyResponseSuccess)
-
-export const getClearDevicePenaltyUrl = (orgName: string,
+export const clearDevicePenalty = (
+    orgName: string,
     productName: string,
-    identifier: string,) => {
-
-
+    identifier: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<void>(
+      {url: `/orgs/${orgName}/products/${productName}/devices/${identifier}/penalty`, method: 'DELETE', signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/products/${productName}/devices/${identifier}/penalty`
-}
-
-export const clearDevicePenalty = async (orgName: string,
-    productName: string,
-    identifier: string, options?: RequestInit): Promise<clearDevicePenaltyResponse> => {
-  
-  return customInstance<clearDevicePenaltyResponse>(getClearDevicePenaltyUrl(orgName,productName,identifier),
-  {      
-    ...options,
-    method: 'DELETE'
-    
-    
-  }
-);}
-  
-
 
 
 export const getClearDevicePenaltyMutationOptions = <TError = unknown,
@@ -1164,38 +897,18 @@ export const useClearDevicePenalty = <TError = unknown,
     /**
  * @summary Get device (short URL)
  */
-export type getDeviceShortResponse200 = {
-  data: DeviceResponse
-  status: 200
-}
-
-export type getDeviceShortResponseSuccess = (getDeviceShortResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getDeviceShortResponse = (getDeviceShortResponseSuccess)
-
-export const getGetDeviceShortUrl = (identifier: string,) => {
-
-
+export const getDeviceShort = (
+    identifier: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<DeviceResponse>(
+      {url: `/devices/${identifier}`, method: 'GET', signal
+    },
+      );
+    }
   
-
-  return `/devices/${identifier}`
-}
-
-export const getDeviceShort = async (identifier: string, options?: RequestInit): Promise<getDeviceShortResponse> => {
-  
-  return customInstance<getDeviceShortResponse>(getGetDeviceShortUrl(identifier),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-  
-
 
 
 
@@ -1215,7 +928,7 @@ const {query: queryOptions} = options ?? {};
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDeviceShort>>> = ({ signal }) => getDeviceShort(identifier, { signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDeviceShort>>> = ({ signal }) => getDeviceShort(identifier, signal);
 
       
 
@@ -1274,38 +987,18 @@ export function useGetDeviceShort<TData = Awaited<ReturnType<typeof getDeviceSho
 /**
  * @summary Reboot device (short URL)
  */
-export type rebootDeviceShortResponse200 = {
-  data: void
-  status: 200
-}
-
-export type rebootDeviceShortResponseSuccess = (rebootDeviceShortResponse200) & {
-  headers: Headers;
-};
-;
-
-export type rebootDeviceShortResponse = (rebootDeviceShortResponseSuccess)
-
-export const getRebootDeviceShortUrl = (identifier: string,) => {
-
-
+export const rebootDeviceShort = (
+    identifier: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<void>(
+      {url: `/devices/${identifier}/reboot`, method: 'POST', signal
+    },
+      );
+    }
   
-
-  return `/devices/${identifier}/reboot`
-}
-
-export const rebootDeviceShort = async (identifier: string, options?: RequestInit): Promise<rebootDeviceShortResponse> => {
-  
-  return customInstance<rebootDeviceShortResponse>(getRebootDeviceShortUrl(identifier),
-  {      
-    ...options,
-    method: 'POST'
-    
-    
-  }
-);}
-  
-
 
 
 export const getRebootDeviceShortMutationOptions = <TError = unknown,
@@ -1355,38 +1048,18 @@ export const useRebootDeviceShort = <TError = unknown,
     /**
  * @summary Reconnect device (short URL)
  */
-export type reconnectDeviceShortResponse200 = {
-  data: void
-  status: 200
-}
-
-export type reconnectDeviceShortResponseSuccess = (reconnectDeviceShortResponse200) & {
-  headers: Headers;
-};
-;
-
-export type reconnectDeviceShortResponse = (reconnectDeviceShortResponseSuccess)
-
-export const getReconnectDeviceShortUrl = (identifier: string,) => {
-
-
+export const reconnectDeviceShort = (
+    identifier: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<void>(
+      {url: `/devices/${identifier}/reconnect`, method: 'POST', signal
+    },
+      );
+    }
   
-
-  return `/devices/${identifier}/reconnect`
-}
-
-export const reconnectDeviceShort = async (identifier: string, options?: RequestInit): Promise<reconnectDeviceShortResponse> => {
-  
-  return customInstance<reconnectDeviceShortResponse>(getReconnectDeviceShortUrl(identifier),
-  {      
-    ...options,
-    method: 'POST'
-    
-    
-  }
-);}
-  
-
 
 
 export const getReconnectDeviceShortMutationOptions = <TError = unknown,
@@ -1436,40 +1109,21 @@ export const useReconnectDeviceShort = <TError = unknown,
     /**
  * @summary Execute code on device (short URL)
  */
-export type executeDeviceCodeShortResponse200 = {
-  data: void
-  status: 200
-}
-
-export type executeDeviceCodeShortResponseSuccess = (executeDeviceCodeShortResponse200) & {
-  headers: Headers;
-};
-;
-
-export type executeDeviceCodeShortResponse = (executeDeviceCodeShortResponseSuccess)
-
-export const getExecuteDeviceCodeShortUrl = (identifier: string,) => {
-
-
+export const executeDeviceCodeShort = (
+    identifier: string,
+    executeDeviceCodeShortBody: ExecuteDeviceCodeShortBody,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<void>(
+      {url: `/devices/${identifier}/code`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: executeDeviceCodeShortBody, signal
+    },
+      );
+    }
   
-
-  return `/devices/${identifier}/code`
-}
-
-export const executeDeviceCodeShort = async (identifier: string,
-    executeDeviceCodeShortBody: ExecuteDeviceCodeShortBody, options?: RequestInit): Promise<executeDeviceCodeShortResponse> => {
-  
-  return customInstance<executeDeviceCodeShortResponse>(getExecuteDeviceCodeShortUrl(identifier),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      executeDeviceCodeShortBody,)
-  }
-);}
-  
-
 
 
 export const getExecuteDeviceCodeShortMutationOptions = <TError = unknown,
@@ -1519,38 +1173,18 @@ export const useExecuteDeviceCodeShort = <TError = unknown,
     /**
  * @summary Upgrade device (short URL)
  */
-export type upgradeDeviceShortResponse200 = {
-  data: void
-  status: 200
-}
-
-export type upgradeDeviceShortResponseSuccess = (upgradeDeviceShortResponse200) & {
-  headers: Headers;
-};
-;
-
-export type upgradeDeviceShortResponse = (upgradeDeviceShortResponseSuccess)
-
-export const getUpgradeDeviceShortUrl = (identifier: string,) => {
-
-
+export const upgradeDeviceShort = (
+    identifier: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<void>(
+      {url: `/devices/${identifier}/upgrade`, method: 'POST', signal
+    },
+      );
+    }
   
-
-  return `/devices/${identifier}/upgrade`
-}
-
-export const upgradeDeviceShort = async (identifier: string, options?: RequestInit): Promise<upgradeDeviceShortResponse> => {
-  
-  return customInstance<upgradeDeviceShortResponse>(getUpgradeDeviceShortUrl(identifier),
-  {      
-    ...options,
-    method: 'POST'
-    
-    
-  }
-);}
-  
-
 
 
 export const getUpgradeDeviceShortMutationOptions = <TError = unknown,
@@ -1600,40 +1234,21 @@ export const useUpgradeDeviceShort = <TError = unknown,
     /**
  * @summary Move device (short URL)
  */
-export type moveDeviceShortResponse200 = {
-  data: void
-  status: 200
-}
-
-export type moveDeviceShortResponseSuccess = (moveDeviceShortResponse200) & {
-  headers: Headers;
-};
-;
-
-export type moveDeviceShortResponse = (moveDeviceShortResponseSuccess)
-
-export const getMoveDeviceShortUrl = (identifier: string,) => {
-
-
+export const moveDeviceShort = (
+    identifier: string,
+    moveDeviceShortBody: MoveDeviceShortBody,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<void>(
+      {url: `/devices/${identifier}/move`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: moveDeviceShortBody, signal
+    },
+      );
+    }
   
-
-  return `/devices/${identifier}/move`
-}
-
-export const moveDeviceShort = async (identifier: string,
-    moveDeviceShortBody: MoveDeviceShortBody, options?: RequestInit): Promise<moveDeviceShortResponse> => {
-  
-  return customInstance<moveDeviceShortResponse>(getMoveDeviceShortUrl(identifier),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      moveDeviceShortBody,)
-  }
-);}
-  
-
 
 
 export const getMoveDeviceShortMutationOptions = <TError = unknown,
@@ -1683,38 +1298,18 @@ export const useMoveDeviceShort = <TError = unknown,
     /**
  * @summary Clear device penalty (short URL)
  */
-export type clearDevicePenaltyShortResponse200 = {
-  data: void
-  status: 200
-}
-
-export type clearDevicePenaltyShortResponseSuccess = (clearDevicePenaltyShortResponse200) & {
-  headers: Headers;
-};
-;
-
-export type clearDevicePenaltyShortResponse = (clearDevicePenaltyShortResponseSuccess)
-
-export const getClearDevicePenaltyShortUrl = (identifier: string,) => {
-
-
+export const clearDevicePenaltyShort = (
+    identifier: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<void>(
+      {url: `/devices/${identifier}/penalty`, method: 'DELETE', signal
+    },
+      );
+    }
   
-
-  return `/devices/${identifier}/penalty`
-}
-
-export const clearDevicePenaltyShort = async (identifier: string, options?: RequestInit): Promise<clearDevicePenaltyShortResponse> => {
-  
-  return customInstance<clearDevicePenaltyShortResponse>(getClearDevicePenaltyShortUrl(identifier),
-  {      
-    ...options,
-    method: 'DELETE'
-    
-    
-  }
-);}
-  
-
 
 
 export const getClearDevicePenaltyShortMutationOptions = <TError = unknown,

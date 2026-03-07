@@ -33,48 +33,24 @@ import type {
 
 import { customInstance } from '../../mutator/custom-instance';
 
-type AwaitedInput<T> = PromiseLike<T> | T;
-
-      type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
-
 
 
 
 /**
  * @summary List org users
  */
-export type listOrgUsersResponse200 = {
-  data: OrgUserListResponse
-  status: 200
-}
-
-export type listOrgUsersResponseSuccess = (listOrgUsersResponse200) & {
-  headers: Headers;
-};
-;
-
-export type listOrgUsersResponse = (listOrgUsersResponseSuccess)
-
-export const getListOrgUsersUrl = (orgName: string,) => {
-
-
+export const listOrgUsers = (
+    orgName: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<OrgUserListResponse>(
+      {url: `/orgs/${orgName}/users`, method: 'GET', signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/users`
-}
-
-export const listOrgUsers = async (orgName: string, options?: RequestInit): Promise<listOrgUsersResponse> => {
-  
-  return customInstance<listOrgUsersResponse>(getListOrgUsersUrl(orgName),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-  
-
 
 
 
@@ -94,7 +70,7 @@ const {query: queryOptions} = options ?? {};
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listOrgUsers>>> = ({ signal }) => listOrgUsers(orgName, { signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listOrgUsers>>> = ({ signal }) => listOrgUsers(orgName, signal);
 
       
 
@@ -153,40 +129,21 @@ export function useListOrgUsers<TData = Awaited<ReturnType<typeof listOrgUsers>>
 /**
  * @summary Add user to org
  */
-export type addOrgUserResponse201 = {
-  data: void
-  status: 201
-}
-
-export type addOrgUserResponseSuccess = (addOrgUserResponse201) & {
-  headers: Headers;
-};
-;
-
-export type addOrgUserResponse = (addOrgUserResponseSuccess)
-
-export const getAddOrgUserUrl = (orgName: string,) => {
-
-
+export const addOrgUser = (
+    orgName: string,
+    orgUserCreationRequest: OrgUserCreationRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<void>(
+      {url: `/orgs/${orgName}/users`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: orgUserCreationRequest, signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/users`
-}
-
-export const addOrgUser = async (orgName: string,
-    orgUserCreationRequest: OrgUserCreationRequest, options?: RequestInit): Promise<addOrgUserResponse> => {
-  
-  return customInstance<addOrgUserResponse>(getAddOrgUserUrl(orgName),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      orgUserCreationRequest,)
-  }
-);}
-  
-
 
 
 export const getAddOrgUserMutationOptions = <TError = unknown,
@@ -236,40 +193,21 @@ export const useAddOrgUser = <TError = unknown,
     /**
  * @summary Invite user to org
  */
-export type inviteOrgUserResponse200 = {
-  data: void
-  status: 200
-}
-
-export type inviteOrgUserResponseSuccess = (inviteOrgUserResponse200) & {
-  headers: Headers;
-};
-;
-
-export type inviteOrgUserResponse = (inviteOrgUserResponseSuccess)
-
-export const getInviteOrgUserUrl = (orgName: string,) => {
-
-
+export const inviteOrgUser = (
+    orgName: string,
+    orgUserCreationRequest: OrgUserCreationRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<void>(
+      {url: `/orgs/${orgName}/users/invite`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: orgUserCreationRequest, signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/users/invite`
-}
-
-export const inviteOrgUser = async (orgName: string,
-    orgUserCreationRequest: OrgUserCreationRequest, options?: RequestInit): Promise<inviteOrgUserResponse> => {
-  
-  return customInstance<inviteOrgUserResponse>(getInviteOrgUserUrl(orgName),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      orgUserCreationRequest,)
-  }
-);}
-  
-
 
 
 export const getInviteOrgUserMutationOptions = <TError = unknown,
@@ -319,40 +257,19 @@ export const useInviteOrgUser = <TError = unknown,
     /**
  * @summary Get org user
  */
-export type getOrgUserResponse200 = {
-  data: OrgUser
-  status: 200
-}
-
-export type getOrgUserResponseSuccess = (getOrgUserResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getOrgUserResponse = (getOrgUserResponseSuccess)
-
-export const getGetOrgUserUrl = (orgName: string,
-    userEmail: string,) => {
-
-
+export const getOrgUser = (
+    orgName: string,
+    userEmail: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<OrgUser>(
+      {url: `/orgs/${orgName}/users/${userEmail}`, method: 'GET', signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/users/${userEmail}`
-}
-
-export const getOrgUser = async (orgName: string,
-    userEmail: string, options?: RequestInit): Promise<getOrgUserResponse> => {
-  
-  return customInstance<getOrgUserResponse>(getGetOrgUserUrl(orgName,userEmail),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-  
-
 
 
 
@@ -374,7 +291,7 @@ const {query: queryOptions} = options ?? {};
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOrgUser>>> = ({ signal }) => getOrgUser(orgName,userEmail, { signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOrgUser>>> = ({ signal }) => getOrgUser(orgName,userEmail, signal);
 
       
 
@@ -437,42 +354,22 @@ export function useGetOrgUser<TData = Awaited<ReturnType<typeof getOrgUser>>, TE
 /**
  * @summary Update org user role
  */
-export type updateOrgUserResponse200 = {
-  data: void
-  status: 200
-}
-
-export type updateOrgUserResponseSuccess = (updateOrgUserResponse200) & {
-  headers: Headers;
-};
-;
-
-export type updateOrgUserResponse = (updateOrgUserResponseSuccess)
-
-export const getUpdateOrgUserUrl = (orgName: string,
-    userEmail: string,) => {
-
-
-  
-
-  return `/orgs/${orgName}/users/${userEmail}`
-}
-
-export const updateOrgUser = async (orgName: string,
+export const updateOrgUser = (
+    orgName: string,
     userEmail: string,
-    orgUserUpdateRequest: OrgUserUpdateRequest, options?: RequestInit): Promise<updateOrgUserResponse> => {
+    orgUserUpdateRequest: OrgUserUpdateRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<void>(
+      {url: `/orgs/${orgName}/users/${userEmail}`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: orgUserUpdateRequest, signal
+    },
+      );
+    }
   
-  return customInstance<updateOrgUserResponse>(getUpdateOrgUserUrl(orgName,userEmail),
-  {      
-    ...options,
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      orgUserUpdateRequest,)
-  }
-);}
-  
-
 
 
 export const getUpdateOrgUserMutationOptions = <TError = unknown,
@@ -522,40 +419,19 @@ export const useUpdateOrgUser = <TError = unknown,
     /**
  * @summary Remove user from org
  */
-export type removeOrgUserResponse204 = {
-  data: void
-  status: 204
-}
-
-export type removeOrgUserResponseSuccess = (removeOrgUserResponse204) & {
-  headers: Headers;
-};
-;
-
-export type removeOrgUserResponse = (removeOrgUserResponseSuccess)
-
-export const getRemoveOrgUserUrl = (orgName: string,
-    userEmail: string,) => {
-
-
+export const removeOrgUser = (
+    orgName: string,
+    userEmail: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<void>(
+      {url: `/orgs/${orgName}/users/${userEmail}`, method: 'DELETE', signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/users/${userEmail}`
-}
-
-export const removeOrgUser = async (orgName: string,
-    userEmail: string, options?: RequestInit): Promise<removeOrgUserResponse> => {
-  
-  return customInstance<removeOrgUserResponse>(getRemoveOrgUserUrl(orgName,userEmail),
-  {      
-    ...options,
-    method: 'DELETE'
-    
-    
-  }
-);}
-  
-
 
 
 export const getRemoveOrgUserMutationOptions = <TError = unknown,

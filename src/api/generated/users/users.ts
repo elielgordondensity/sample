@@ -26,55 +26,24 @@ import type {
 
 import { customInstance } from '../../mutator/custom-instance';
 
-type AwaitedInput<T> = PromiseLike<T> | T;
-
-      type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
-
 
 
 
 /**
  * @summary Get current user
  */
-export type getMeResponse200 = {
-  data: UserResponse
-  status: 200
-}
-
-export type getMeResponse401 = {
-  data: void
-  status: 401
-}
-
-export type getMeResponseSuccess = (getMeResponse200) & {
-  headers: Headers;
-};
-export type getMeResponseError = (getMeResponse401) & {
-  headers: Headers;
-};
-
-export type getMeResponse = (getMeResponseSuccess | getMeResponseError)
-
-export const getGetMeUrl = () => {
-
-
-  
-
-  return `/users/me`
-}
-
-export const getMe = async ( options?: RequestInit): Promise<getMeResponse> => {
-  
-  return customInstance<getMeResponse>(getGetMeUrl(),
-  {      
-    ...options,
-    method: 'GET'
+export const getMe = (
     
-    
-  }
-);}
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<UserResponse>(
+      {url: `/users/me`, method: 'GET', signal
+    },
+      );
+    }
   
-
 
 
 
@@ -94,7 +63,7 @@ const {query: queryOptions} = options ?? {};
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMe>>> = ({ signal }) => getMe({ signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMe>>> = ({ signal }) => getMe(signal);
 
       
 

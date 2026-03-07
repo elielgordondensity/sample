@@ -32,50 +32,25 @@ import type {
 
 import { customInstance } from '../../mutator/custom-instance';
 
-type AwaitedInput<T> = PromiseLike<T> | T;
-
-      type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
-
 
 
 
 /**
  * @summary List firmwares
  */
-export type listFirmwaresResponse200 = {
-  data: FirmwareListResponse
-  status: 200
-}
-
-export type listFirmwaresResponseSuccess = (listFirmwaresResponse200) & {
-  headers: Headers;
-};
-;
-
-export type listFirmwaresResponse = (listFirmwaresResponseSuccess)
-
-export const getListFirmwaresUrl = (orgName: string,
-    productName: string,) => {
-
-
+export const listFirmwares = (
+    orgName: string,
+    productName: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<FirmwareListResponse>(
+      {url: `/orgs/${orgName}/products/${productName}/firmwares`, method: 'GET', signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/products/${productName}/firmwares`
-}
-
-export const listFirmwares = async (orgName: string,
-    productName: string, options?: RequestInit): Promise<listFirmwaresResponse> => {
-  
-  return customInstance<listFirmwaresResponse>(getListFirmwaresUrl(orgName,productName),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-  
-
 
 
 
@@ -97,7 +72,7 @@ const {query: queryOptions} = options ?? {};
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listFirmwares>>> = ({ signal }) => listFirmwares(orgName,productName, { signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listFirmwares>>> = ({ signal }) => listFirmwares(orgName,productName, signal);
 
       
 
@@ -160,44 +135,23 @@ export function useListFirmwares<TData = Awaited<ReturnType<typeof listFirmwares
 /**
  * @summary Upload firmware
  */
-export type createFirmwareResponse201 = {
-  data: FirmwareResponse
-  status: 201
-}
-
-export type createFirmwareResponseSuccess = (createFirmwareResponse201) & {
-  headers: Headers;
-};
-;
-
-export type createFirmwareResponse = (createFirmwareResponseSuccess)
-
-export const getCreateFirmwareUrl = (orgName: string,
-    productName: string,) => {
-
-
-  
-
-  return `/orgs/${orgName}/products/${productName}/firmwares`
-}
-
-export const createFirmware = async (orgName: string,
+export const createFirmware = (
+    orgName: string,
     productName: string,
-    createFirmwareBody: CreateFirmwareBody, options?: RequestInit): Promise<createFirmwareResponse> => {
-    const formData = new FormData();
+    createFirmwareBody: CreateFirmwareBody,
+ signal?: AbortSignal
+) => {
+      
+      const formData = new FormData();
 formData.append(`firmware`, createFirmwareBody.firmware);
 
-  return customInstance<createFirmwareResponse>(getCreateFirmwareUrl(orgName,productName),
-  {      
-    ...options,
-    method: 'POST'
-    ,
-    body: 
-      formData,
-  }
-);}
+      return customInstance<FirmwareResponse>(
+      {url: `/orgs/${orgName}/products/${productName}/firmwares`, method: 'POST',
+       data: formData, signal
+    },
+      );
+    }
   
-
 
 
 export const getCreateFirmwareMutationOptions = <TError = unknown,
@@ -247,42 +201,20 @@ export const useCreateFirmware = <TError = unknown,
     /**
  * @summary Get firmware
  */
-export type getFirmwareResponse200 = {
-  data: FirmwareResponse
-  status: 200
-}
-
-export type getFirmwareResponseSuccess = (getFirmwareResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getFirmwareResponse = (getFirmwareResponseSuccess)
-
-export const getGetFirmwareUrl = (orgName: string,
+export const getFirmware = (
+    orgName: string,
     productName: string,
-    uuid: string,) => {
-
-
+    uuid: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<FirmwareResponse>(
+      {url: `/orgs/${orgName}/products/${productName}/firmwares/${uuid}`, method: 'GET', signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/products/${productName}/firmwares/${uuid}`
-}
-
-export const getFirmware = async (orgName: string,
-    productName: string,
-    uuid: string, options?: RequestInit): Promise<getFirmwareResponse> => {
-  
-  return customInstance<getFirmwareResponse>(getGetFirmwareUrl(orgName,productName,uuid),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-  
-
 
 
 
@@ -306,7 +238,7 @@ const {query: queryOptions} = options ?? {};
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getFirmware>>> = ({ signal }) => getFirmware(orgName,productName,uuid, { signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getFirmware>>> = ({ signal }) => getFirmware(orgName,productName,uuid, signal);
 
       
 
@@ -373,42 +305,20 @@ export function useGetFirmware<TData = Awaited<ReturnType<typeof getFirmware>>, 
 /**
  * @summary Delete firmware
  */
-export type deleteFirmwareResponse204 = {
-  data: void
-  status: 204
-}
-
-export type deleteFirmwareResponseSuccess = (deleteFirmwareResponse204) & {
-  headers: Headers;
-};
-;
-
-export type deleteFirmwareResponse = (deleteFirmwareResponseSuccess)
-
-export const getDeleteFirmwareUrl = (orgName: string,
+export const deleteFirmware = (
+    orgName: string,
     productName: string,
-    uuid: string,) => {
-
-
+    uuid: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<void>(
+      {url: `/orgs/${orgName}/products/${productName}/firmwares/${uuid}`, method: 'DELETE', signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/products/${productName}/firmwares/${uuid}`
-}
-
-export const deleteFirmware = async (orgName: string,
-    productName: string,
-    uuid: string, options?: RequestInit): Promise<deleteFirmwareResponse> => {
-  
-  return customInstance<deleteFirmwareResponse>(getDeleteFirmwareUrl(orgName,productName,uuid),
-  {      
-    ...options,
-    method: 'DELETE'
-    
-    
-  }
-);}
-  
-
 
 
 export const getDeleteFirmwareMutationOptions = <TError = unknown,

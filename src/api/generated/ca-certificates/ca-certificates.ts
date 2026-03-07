@@ -32,48 +32,24 @@ import type {
 
 import { customInstance } from '../../mutator/custom-instance';
 
-type AwaitedInput<T> = PromiseLike<T> | T;
-
-      type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
-
 
 
 
 /**
  * @summary List CA certificates
  */
-export type listCACertificatesResponse200 = {
-  data: CACertificateListResponse
-  status: 200
-}
-
-export type listCACertificatesResponseSuccess = (listCACertificatesResponse200) & {
-  headers: Headers;
-};
-;
-
-export type listCACertificatesResponse = (listCACertificatesResponseSuccess)
-
-export const getListCACertificatesUrl = (orgName: string,) => {
-
-
+export const listCACertificates = (
+    orgName: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<CACertificateListResponse>(
+      {url: `/orgs/${orgName}/ca_certificates`, method: 'GET', signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/ca_certificates`
-}
-
-export const listCACertificates = async (orgName: string, options?: RequestInit): Promise<listCACertificatesResponse> => {
-  
-  return customInstance<listCACertificatesResponse>(getListCACertificatesUrl(orgName),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-  
-
 
 
 
@@ -93,7 +69,7 @@ const {query: queryOptions} = options ?? {};
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listCACertificates>>> = ({ signal }) => listCACertificates(orgName, { signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listCACertificates>>> = ({ signal }) => listCACertificates(orgName, signal);
 
       
 
@@ -152,40 +128,21 @@ export function useListCACertificates<TData = Awaited<ReturnType<typeof listCACe
 /**
  * @summary Create CA certificate
  */
-export type createCACertificateResponse201 = {
-  data: CACertificateResponse
-  status: 201
-}
-
-export type createCACertificateResponseSuccess = (createCACertificateResponse201) & {
-  headers: Headers;
-};
-;
-
-export type createCACertificateResponse = (createCACertificateResponseSuccess)
-
-export const getCreateCACertificateUrl = (orgName: string,) => {
-
-
+export const createCACertificate = (
+    orgName: string,
+    cACertificateCreationRequest: CACertificateCreationRequest,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<CACertificateResponse>(
+      {url: `/orgs/${orgName}/ca_certificates`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: cACertificateCreationRequest, signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/ca_certificates`
-}
-
-export const createCACertificate = async (orgName: string,
-    cACertificateCreationRequest: CACertificateCreationRequest, options?: RequestInit): Promise<createCACertificateResponse> => {
-  
-  return customInstance<createCACertificateResponse>(getCreateCACertificateUrl(orgName),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      cACertificateCreationRequest,)
-  }
-);}
-  
-
 
 
 export const getCreateCACertificateMutationOptions = <TError = unknown,
@@ -235,40 +192,19 @@ export const useCreateCACertificate = <TError = unknown,
     /**
  * @summary Get CA certificate
  */
-export type getCACertificateResponse200 = {
-  data: CACertificateResponse
-  status: 200
-}
-
-export type getCACertificateResponseSuccess = (getCACertificateResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getCACertificateResponse = (getCACertificateResponseSuccess)
-
-export const getGetCACertificateUrl = (orgName: string,
-    serial: string,) => {
-
-
+export const getCACertificate = (
+    orgName: string,
+    serial: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<CACertificateResponse>(
+      {url: `/orgs/${orgName}/ca_certificates/${serial}`, method: 'GET', signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/ca_certificates/${serial}`
-}
-
-export const getCACertificate = async (orgName: string,
-    serial: string, options?: RequestInit): Promise<getCACertificateResponse> => {
-  
-  return customInstance<getCACertificateResponse>(getGetCACertificateUrl(orgName,serial),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-  
-
 
 
 
@@ -290,7 +226,7 @@ const {query: queryOptions} = options ?? {};
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCACertificate>>> = ({ signal }) => getCACertificate(orgName,serial, { signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCACertificate>>> = ({ signal }) => getCACertificate(orgName,serial, signal);
 
       
 
@@ -353,40 +289,19 @@ export function useGetCACertificate<TData = Awaited<ReturnType<typeof getCACerti
 /**
  * @summary Delete CA certificate
  */
-export type deleteCACertificateResponse204 = {
-  data: void
-  status: 204
-}
-
-export type deleteCACertificateResponseSuccess = (deleteCACertificateResponse204) & {
-  headers: Headers;
-};
-;
-
-export type deleteCACertificateResponse = (deleteCACertificateResponseSuccess)
-
-export const getDeleteCACertificateUrl = (orgName: string,
-    serial: string,) => {
-
-
+export const deleteCACertificate = (
+    orgName: string,
+    serial: string,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<void>(
+      {url: `/orgs/${orgName}/ca_certificates/${serial}`, method: 'DELETE', signal
+    },
+      );
+    }
   
-
-  return `/orgs/${orgName}/ca_certificates/${serial}`
-}
-
-export const deleteCACertificate = async (orgName: string,
-    serial: string, options?: RequestInit): Promise<deleteCACertificateResponse> => {
-  
-  return customInstance<deleteCACertificateResponse>(getDeleteCACertificateUrl(orgName,serial),
-  {      
-    ...options,
-    method: 'DELETE'
-    
-    
-  }
-);}
-  
-
 
 
 export const getDeleteCACertificateMutationOptions = <TError = unknown,
