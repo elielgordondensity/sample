@@ -204,7 +204,7 @@ components:
           type: integer
         total_pages:
           type: integer
-        total_count:
+        total_entries:
           type: integer
 
     DeviceListResponse:
