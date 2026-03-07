@@ -58,6 +58,7 @@ export * from './orgUserListResponse';
 export * from './orgUserRole';
 export * from './orgUserUpdateRequest';
 export * from './orgUserUpdateRequestRole';
+export * from './pagination';
 export * from './product';
 export * from './productCreationRequest';
 export * from './productCreationRequestProduct';

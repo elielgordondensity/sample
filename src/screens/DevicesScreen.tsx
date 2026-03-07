@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
   StyleSheet,
   Text,
@@ -18,14 +19,24 @@ import {
   UpdateStatusChip,
 } from "../components/ui";
 import { useOrgProduct } from "../context/OrgProductContext";
-import { useDevices } from "../hooks/useApi";
+import { useInfiniteDevices } from "../hooks/useApi";
 import { useDeviceChannel } from "../hooks/useDeviceChannel";
 import type { Device } from "../api/generated/schemas";
+
+function useDebouncedValue<T>(value: T, delay: number): T {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const id = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(id);
+  }, [value, delay]);
+  return debounced;
+}
 
 export default function DevicesScreen() {
   const { org, product, resetOrgAndProduct } = useOrgProduct();
   const [search, setSearch] = useState("");
-  const devicesQuery = useDevices(search ? { search } : undefined);
+  const debouncedSearch = useDebouncedValue(search, 300);
+  const devicesQuery = useInfiniteDevices(debouncedSearch || undefined);
 
   // Real-time updates
   useDeviceChannel();
@@ -39,7 +50,7 @@ export default function DevicesScreen() {
       />
     );
 
-  const devices = devicesQuery.data?.data ?? [];
+  const devices = devicesQuery.data?.pages.flatMap((p) => p.data ?? []) ?? [];
 
   const renderDevice = ({ item }: { item: Device }) => {
     const tags = item.tags?.split(",").map((t) => t.trim()).filter(Boolean) ?? [];
@@ -120,6 +131,20 @@ export default function DevicesScreen() {
           keyExtractor={(item) => String(item.identifier)}
           renderItem={renderDevice}
           contentContainerStyle={styles.list}
+          onEndReached={() => {
+            if (devicesQuery.hasNextPage && !devicesQuery.isFetchingNextPage) {
+              devicesQuery.fetchNextPage();
+            }
+          }}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            devicesQuery.isFetchingNextPage ? (
+              <ActivityIndicator
+                style={styles.loadingFooter}
+                color={colors.accent}
+              />
+            ) : null
+          }
         />
       )}
     </View>
@@ -163,6 +188,9 @@ const styles = StyleSheet.create({
   },
   list: {
     paddingBottom: spacing.xl,
+  },
+  loadingFooter: {
+    paddingVertical: spacing.lg,
   },
   deviceHeader: {
     flexDirection: "row",

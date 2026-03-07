@@ -195,6 +195,18 @@ components:
           format: date-time
           deprecated: true
 
+    Pagination:
+      type: object
+      properties:
+        page_number:
+          type: integer
+        page_size:
+          type: integer
+        total_pages:
+          type: integer
+        total_count:
+          type: integer
+
     DeviceListResponse:
       type: object
       properties:
@@ -202,6 +214,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Device"
+        pagination:
+          $ref: "#/components/schemas/Pagination"
 
     DeviceResponse:
       type: object

@@ -5,10 +5,10 @@
  * NervesHub firmware update and device management API
  * OpenAPI spec version: 2.0.0
  */
-import type { Device } from './device';
-import type { Pagination } from './pagination';
 
-export interface DeviceListResponse {
-  data?: Device[];
-  pagination?: Pagination;
+export interface Pagination {
+  page_number?: number;
+  page_size?: number;
+  total_pages?: number;
+  total_count?: number;
 }

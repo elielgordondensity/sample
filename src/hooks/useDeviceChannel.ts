@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import type { InfiniteData } from "@tanstack/react-query";
 import { Channel, Socket } from "phoenix";
 import type { Device, DeviceListResponse } from "../api/generated/schemas";
 import { getListDevicesQueryKey } from "../api/generated/devices/devices";
@@ -37,22 +38,25 @@ export function useDeviceChannel() {
     channel.on("presence_diff", (diff) => {
       const queryKey = getListDevicesQueryKey(org, product);
 
-      queryClient.setQueriesData<DeviceListResponse>(
+      const joinsSet = new Set(Object.keys(diff.joins ?? {}));
+      const leavesSet = new Set(Object.keys(diff.leaves ?? {}));
+
+      queryClient.setQueriesData<InfiniteData<DeviceListResponse>>(
         { queryKey },
         (old) => {
-          if (!old?.data) return old;
-
-          const joinsSet = new Set(Object.keys(diff.joins ?? {}));
-          const leavesSet = new Set(Object.keys(diff.leaves ?? {}));
-
-          const updated = old.data.map((device: Device) => {
-            const id = String(device.identifier);
-            if (joinsSet.has(id)) return { ...device, online: true };
-            if (leavesSet.has(id)) return { ...device, online: false };
-            return device;
-          });
-
-          return { ...old, data: updated };
+          if (!old) return old;
+          return {
+            ...old,
+            pages: old.pages.map((page) => ({
+              ...page,
+              data: page.data?.map((device: Device) => {
+                const id = String(device.identifier);
+                if (joinsSet.has(id)) return { ...device, online: true };
+                if (leavesSet.has(id)) return { ...device, online: false };
+                return device;
+              }),
+            })),
+          };
         },
       );
     });
@@ -61,19 +65,22 @@ export function useDeviceChannel() {
     channel.on("update", (payload) => {
       const queryKey = getListDevicesQueryKey(org, product);
 
-      queryClient.setQueriesData<DeviceListResponse>(
+      queryClient.setQueriesData<InfiniteData<DeviceListResponse>>(
         { queryKey },
         (old) => {
-          if (!old?.data) return old;
-
-          const updated = old.data.map((device: Device) => {
-            if (String(device.identifier) === String(payload.identifier)) {
-              return { ...device, ...payload };
-            }
-            return device;
-          });
-
-          return { ...old, data: updated };
+          if (!old) return old;
+          return {
+            ...old,
+            pages: old.pages.map((page) => ({
+              ...page,
+              data: page.data?.map((device: Device) => {
+                if (String(device.identifier) === String(payload.identifier)) {
+                  return { ...device, ...payload };
+                }
+                return device;
+              }),
+            })),
+          };
         },
       );
     });
