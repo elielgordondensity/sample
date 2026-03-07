@@ -1,25 +1,36 @@
 {
-  "name": "sample",
+  "name": "nerveshub-mobile",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
     "api:generate": "orval",
-    "api:generate:watch": "orval --watch",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "http://local_proxy@127.0.0.1:34269/git/elielgordondensity/sample"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "orval": "^8.5.3"
+    "api:generate:watch": "orval --watch"
   },
   "dependencies": {
+    "@react-navigation/bottom-tabs": "^7.3.10",
+    "@react-navigation/native": "^7.1.6",
+    "@react-navigation/native-stack": "^7.3.10",
     "@tanstack/react-query": "^5.90.21",
-    "axios": "^1.13.6"
-  }
+    "axios": "^1.13.6",
+    "expo": "~55.0.5",
+    "expo-secure-store": "~15.0.2",
+    "expo-status-bar": "~55.0.4",
+    "phoenix": "^1.7.17",
+    "react": "19.2.0",
+    "react-native": "0.83.2",
+    "react-native-mmkv": "^3.2.0",
+    "react-native-safe-area-context": "^5.4.0",
+    "react-native-screens": "^4.11.1"
+  },
+  "devDependencies": {
+    "@types/phoenix": "^1.6.6",
+    "@types/react": "~19.2.2",
+    "orval": "^8.5.3",
+    "typescript": "~5.9.2"
+  },
+  "private": true
 }
