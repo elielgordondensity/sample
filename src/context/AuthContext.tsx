@@ -171,3 +171,24 @@ export function useIsAuthenticated(): {
     hasOrgProduct: !!org && !!product,
   };
 }
+
+// Boolean hooks for React Navigation static `if` directives
+export function useIsSignedIn() {
+  const { token } = useAuth();
+  return !!token;
+}
+
+export function useIsSignedOut() {
+  const { token } = useAuth();
+  return !token;
+}
+
+export function useHasOrgProduct() {
+  const { org, product } = useAuth();
+  return !!org && !!product;
+}
+
+export function useNeedsOrgProduct() {
+  const { org, product } = useAuth();
+  return !org || !product;
+}

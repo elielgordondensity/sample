@@ -1,30 +1,13 @@
-import React from "react";
+import { Text } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Text } from "react-native";
 import { colors, typography } from "../components/tokens";
-import { useIsAuthenticated } from "../context/AuthContext";
+import { useHasOrgProduct, useNeedsOrgProduct } from "../context/AuthContext";
 
 import OrgProductSelector from "../screens/OrgProductSelector";
 import DevicesScreen from "../screens/DevicesScreen";
 import FirmwareScreen from "../screens/FirmwareScreen";
 import DeploymentsScreen from "../screens/DeploymentsScreen";
-
-// ── Type definitions ─────────────────────────────────────────────
-
-export type HomeStackParamList = {
-  OrgProduct: undefined;
-  Main: undefined;
-};
-
-export type MainTabParamList = {
-  Devices: undefined;
-  Firmware: undefined;
-  Deployments: undefined;
-};
-
-const Stack = createNativeStackNavigator<HomeStackParamList>();
-const Tab = createBottomTabNavigator<MainTabParamList>();
 
 // ── Tab icon helper ──────────────────────────────────────────────
 
@@ -44,67 +27,57 @@ function TabIcon({ label, focused }: { label: string; focused: boolean }) {
 
 // ── Main tabs ────────────────────────────────────────────────────
 
-function MainTabs() {
-  return (
-    <Tab.Navigator
-      screenOptions={{
-        headerShown: false,
-        tabBarStyle: {
-          backgroundColor: colors.surface,
-          borderTopColor: colors.border,
-          borderTopWidth: 1,
-        },
-        tabBarActiveTintColor: colors.accent,
-        tabBarInactiveTintColor: colors.textTertiary,
-        tabBarLabelStyle: {
-          ...typography.caption,
-          marginTop: -2,
-        },
-      }}
-    >
-      <Tab.Screen
-        name="Devices"
-        component={DevicesScreen}
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <TabIcon label="📱" focused={focused} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Firmware"
-        component={FirmwareScreen}
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <TabIcon label="📦" focused={focused} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Deployments"
-        component={DeploymentsScreen}
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <TabIcon label="🚀" focused={focused} />
-          ),
-        }}
-      />
-    </Tab.Navigator>
-  );
-}
+const MainTabs = createBottomTabNavigator({
+  screenOptions: {
+    headerShown: false,
+    tabBarStyle: {
+      backgroundColor: colors.surface,
+      borderTopColor: colors.border,
+      borderTopWidth: 1,
+    },
+    tabBarActiveTintColor: colors.accent,
+    tabBarInactiveTintColor: colors.textTertiary,
+    tabBarLabelStyle: {
+      ...typography.caption,
+      marginTop: -2,
+    },
+  },
+  screens: {
+    Devices: {
+      screen: DevicesScreen,
+      options: {
+        tabBarIcon: ({ focused }) => <TabIcon label="📱" focused={focused} />,
+      },
+    },
+    Firmware: {
+      screen: FirmwareScreen,
+      options: {
+        tabBarIcon: ({ focused }) => <TabIcon label="📦" focused={focused} />,
+      },
+    },
+    Deployments: {
+      screen: DeploymentsScreen,
+      options: {
+        tabBarIcon: ({ focused }) => <TabIcon label="🚀" focused={focused} />,
+      },
+    },
+  },
+});
 
 // ── Home navigator ───────────────────────────────────────────────
 
-export default function HomeNavigator() {
-  const { hasOrgProduct } = useIsAuthenticated();
+const HomeNavigator = createNativeStackNavigator({
+  screenOptions: { headerShown: false },
+  screens: {
+    OrgProduct: {
+      if: useNeedsOrgProduct,
+      screen: OrgProductSelector,
+    },
+    Main: {
+      if: useHasOrgProduct,
+      screen: MainTabs,
+    },
+  },
+});
 
-  return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {!hasOrgProduct ? (
-        <Stack.Screen name="OrgProduct" component={OrgProductSelector} />
-      ) : (
-        <Stack.Screen name="Main" component={MainTabs} />
-      )}
-    </Stack.Navigator>
-  );
-}
+export default HomeNavigator;

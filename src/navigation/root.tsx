@@ -1,13 +1,34 @@
 import React from "react";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createStaticNavigation } from "@react-navigation/native";
 import { LoadingView } from "../components/ui";
-import { useIsAuthenticated } from "../context/AuthContext";
+import {
+  useAuth,
+  useIsSignedIn,
+  useIsSignedOut,
+} from "../context/AuthContext";
 import AuthNavigator from "./auth";
 import HomeNavigator from "./home";
 
-export default function RootNavigator() {
-  const { isLoading, isAuthenticated } = useIsAuthenticated();
+const RootStack = createNativeStackNavigator({
+  screenOptions: { headerShown: false },
+  layout: ({ children }) => {
+    const { isLoading } = useAuth();
+    if (isLoading) return <LoadingView message="Loading…" />;
+    return <>{children}</>;
+  },
+  screens: {
+    Auth: {
+      if: useIsSignedOut,
+      screen: AuthNavigator,
+    },
+    Home: {
+      if: useIsSignedIn,
+      screen: HomeNavigator,
+    },
+  },
+});
 
-  if (isLoading) return <LoadingView message="Loading…" />;
+const Navigation = createStaticNavigation(RootStack);
 
-  return isAuthenticated ? <HomeNavigator /> : <AuthNavigator />;
-}
+export default Navigation;
