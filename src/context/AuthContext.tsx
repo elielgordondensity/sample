@@ -6,7 +6,12 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { configureAxios, resetAxios } from "../api/mutator/custom-instance";
+import axios from "axios";
+import {
+  configureAxios,
+  customInstance,
+  resetAxios,
+} from "../api/mutator/custom-instance";
 import { deleteToken, getToken, setToken } from "../utils/secureStorage";
 import {
   getString,
@@ -14,6 +19,7 @@ import {
   setString,
   STORAGE_KEYS,
 } from "../utils/storage";
+import type { AuthResponse, UserResponse } from "../api/generated/schemas";
 
 interface AuthState {
   isLoading: boolean;
@@ -25,6 +31,11 @@ interface AuthState {
 
 interface AuthContextValue extends AuthState {
   login: (instanceUrl: string, token: string) => Promise<void>;
+  loginWithCredentials: (
+    instanceUrl: string,
+    email: string,
+    password: string,
+  ) => Promise<void>;
   logout: () => Promise<void>;
   selectOrgAndProduct: (org: string, product: string) => void;
   resetOrgAndProduct: () => void;
@@ -71,6 +82,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setState((prev) => ({ ...prev, instanceUrl, token, org: null, product: null }));
   }, []);
 
+  const loginWithCredentials = useCallback(
+    async (instanceUrl: string, email: string, password: string) => {
+      // Authenticate with email/password to obtain a token
+      const authResponse = await axios.post<AuthResponse>(
+        `${instanceUrl}/api/users/auth`,
+        { email, password },
+      );
+
+      const authToken = authResponse.data?.data?.token;
+      if (!authToken) {
+        throw new Error("No token received");
+      }
+
+      // Validate the token by fetching the current user
+      configureAxios(instanceUrl, authToken);
+      const userResponse = await customInstance<UserResponse>({
+        url: "/users/me",
+        method: "GET",
+      });
+
+      if (!userResponse?.data) {
+        throw new Error("Invalid response");
+      }
+
+      await login(instanceUrl, authToken);
+    },
+    [login],
+  );
+
   const logout = useCallback(async () => {
     await deleteToken();
     remove(STORAGE_KEYS.INSTANCE_URL);
@@ -102,11 +142,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     () => ({
       ...state,
       login,
+      loginWithCredentials,
       logout,
       selectOrgAndProduct,
       resetOrgAndProduct,
     }),
-    [state, login, logout, selectOrgAndProduct, resetOrgAndProduct],
+    [state, login, loginWithCredentials, logout, selectOrgAndProduct, resetOrgAndProduct],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

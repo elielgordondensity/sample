@@ -9,15 +9,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import axios from "axios";
 import { colors, radius, spacing, typography } from "../components/tokens";
 import { LoadingView } from "../components/ui";
 import { useAuth } from "../context/AuthContext";
-import { configureAxios, customInstance } from "../api/mutator/custom-instance";
-import type { AuthResponse, UserResponse } from "../api/generated/schemas";
 
 export default function LoginScreen() {
-  const { login } = useAuth();
+  const { loginWithCredentials } = useAuth();
   const [instanceUrl, setInstanceUrl] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,29 +34,7 @@ export default function LoginScreen() {
 
     setLoading(true);
     try {
-      // Authenticate with email/password to obtain a token
-      const authResponse = await axios.post<AuthResponse>(
-        `${trimmedUrl}/api/users/auth`,
-        { email: trimmedEmail, password },
-      );
-
-      const token = authResponse.data?.data?.token;
-      if (!token) {
-        throw new Error("No token received");
-      }
-
-      // Validate the token by fetching the current user
-      configureAxios(trimmedUrl, token);
-      const userResponse = await customInstance<UserResponse>({
-        url: "/users/me",
-        method: "GET",
-      });
-
-      if (!userResponse?.data) {
-        throw new Error("Invalid response");
-      }
-
-      await login(trimmedUrl, token);
+      await loginWithCredentials(trimmedUrl, trimmedEmail, password);
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : "Could not authenticate";
