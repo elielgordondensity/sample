@@ -14,6 +14,8 @@ export function useAllOrgProducts() {
   const orgsQuery = useOrgs();
   const orgs = orgsQuery.data?.data ?? [];
 
+  console.log("ORgs: ", orgs);
+
   const productQueries = useQueries({
     queries: orgs.map((o) => ({
       queryKey: getListProductsQueryKey(o.name),
@@ -25,8 +27,7 @@ export function useAllOrgProducts() {
 
   const isLoading =
     orgsQuery.isLoading || productQueries.some((q) => q.isLoading);
-  const isError =
-    orgsQuery.isError || productQueries.some((q) => q.isError);
+  const isError = orgsQuery.isError || productQueries.some((q) => q.isError);
 
   const data: OrgWithProducts[] = orgs
     .map((o, i) => ({

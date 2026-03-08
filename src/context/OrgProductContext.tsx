@@ -9,12 +9,12 @@ import React, {
 import { getString, remove, setString, STORAGE_KEYS } from "../utils/storage";
 
 interface OrgProductState {
-  org: string | null;
-  product: string | null;
+  orgId: string | null;
+  productId: string | null;
 }
 
 interface OrgProductContextValue extends OrgProductState {
-  selectOrgAndProduct: (org: string, product: string) => void;
+  selectOrgAndProduct: (orgId: string, productId: string) => void;
   resetOrgAndProduct: () => void;
 }
 
@@ -26,27 +26,30 @@ export function OrgProductProvider({
   children: React.ReactNode;
 }) {
   const [state, setState] = useState<OrgProductState>({
-    org: null,
-    product: null,
+    orgId: null,
+    productId: null,
   });
 
   // Rehydrate from MMKV on mount
   useEffect(() => {
-    const org = getString(STORAGE_KEYS.ORG) ?? null;
-    const product = getString(STORAGE_KEYS.PRODUCT) ?? null;
-    setState({ org, product });
+    const orgId = getString(STORAGE_KEYS.ORG) ?? null;
+    const productId = getString(STORAGE_KEYS.PRODUCT) ?? null;
+    setState({ orgId, productId });
   }, []);
 
-  const selectOrgAndProduct = useCallback((org: string, product: string) => {
-    setString(STORAGE_KEYS.ORG, org);
-    setString(STORAGE_KEYS.PRODUCT, product);
-    setState({ org, product });
-  }, []);
+  const selectOrgAndProduct = useCallback(
+    (orgId: string, productId: string) => {
+      setString(STORAGE_KEYS.ORG, orgId);
+      setString(STORAGE_KEYS.PRODUCT, productId);
+      setState({ orgId, productId });
+    },
+    [],
+  );
 
   const resetOrgAndProduct = useCallback(() => {
     remove(STORAGE_KEYS.ORG);
     remove(STORAGE_KEYS.PRODUCT);
-    setState({ org: null, product: null });
+    setState({ orgId: null, productId: null });
   }, []);
 
   const value = useMemo<OrgProductContextValue>(
@@ -70,11 +73,11 @@ export function useOrgProduct(): OrgProductContextValue {
 
 // Boolean hooks for React Navigation static `if` directives
 export function useHasOrgProduct() {
-  const { org, product } = useOrgProduct();
-  return !!org && !!product;
+  const { orgId, productId } = useOrgProduct();
+  return !!orgId && !!productId;
 }
 
 export function useNeedsOrgProduct() {
-  const { org, product } = useOrgProduct();
-  return !org || !product;
+  const { orgId, productId } = useOrgProduct();
+  return !orgId || !productId;
 }

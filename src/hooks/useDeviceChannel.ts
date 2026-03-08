@@ -13,13 +13,13 @@ import { useOrgProduct } from "../context/OrgProductContext";
  */
 export function useDeviceChannel() {
   const { instanceUrl, token } = useAuth();
-  const { org, product } = useOrgProduct();
+  const { orgId, productId } = useOrgProduct();
   const queryClient = useQueryClient();
   const socketRef = useRef<Socket | null>(null);
   const channelRef = useRef<Channel | null>(null);
 
   useEffect(() => {
-    if (!instanceUrl || !token || !org || !product) return;
+    if (!instanceUrl || !token || !orgId || !productId) return;
 
     const wsUrl = instanceUrl.replace(/^https?/, "wss");
     const socket = new Socket(`${wsUrl}/socket`, {
@@ -28,7 +28,7 @@ export function useDeviceChannel() {
     socket.connect();
     socketRef.current = socket;
 
-    const topic = `product:${org}:${product}`;
+    const topic = `product:${orgId}:${productId}`;
     const channel = socket.channel(topic, {});
     channelRef.current = channel;
 
@@ -36,7 +36,7 @@ export function useDeviceChannel() {
 
     // ── Presence diff: toggle online status ───────────────────────
     channel.on("presence_diff", (diff) => {
-      const queryKey = getListDevicesQueryKey(org, product);
+      const queryKey = getListDevicesQueryKey(orgId, productId);
 
       const joinsSet = new Set(Object.keys(diff.joins ?? {}));
       const leavesSet = new Set(Object.keys(diff.leaves ?? {}));
@@ -63,7 +63,7 @@ export function useDeviceChannel() {
 
     // ── Update event: patch firmware_update_status ────────────────
     channel.on("update", (payload) => {
-      const queryKey = getListDevicesQueryKey(org, product);
+      const queryKey = getListDevicesQueryKey(orgId, productId);
 
       queryClient.setQueriesData<InfiniteData<DeviceListResponse>>(
         { queryKey },
@@ -91,5 +91,5 @@ export function useDeviceChannel() {
       socketRef.current = null;
       channelRef.current = null;
     };
-  }, [instanceUrl, token, org, product, queryClient]);
+  }, [instanceUrl, token, orgId, productId, queryClient]);
 }

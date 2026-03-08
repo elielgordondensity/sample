@@ -2,19 +2,29 @@ import React from "react";
 import {
   ActivityIndicator,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import { colors, radius, spacing, typography } from "./tokens";
+import { useTheme } from "../context/ThemeContext";
+import { Typography } from "./typography";
+import { radius, spacing } from "./tokens";
+import { colors } from "../theme/colors";
 
 // ── Loading ──────────────────────────────────────────────────────
 
 export function LoadingView({ message = "Loading…" }: { message?: string }) {
+  const { colors } = useTheme();
   return (
-    <View style={styles.center}>
+    <View style={[styles.center, { backgroundColor: colors.background }]}>
       <ActivityIndicator size="large" color={colors.accent} />
-      <Text style={[typography.body, styles.loadingText]}>{message}</Text>
+      <Typography
+        type="body"
+        fontSize={14}
+        marginTop={spacing.md}
+        color={colors.textSecondary}
+      >
+        {message}
+      </Typography>
     </View>
   );
 }
@@ -28,13 +38,34 @@ export function ErrorView({
   message?: string;
   onRetry?: () => void;
 }) {
+  const { colors } = useTheme();
   return (
-    <View style={styles.center}>
-      <Text style={[typography.subtitle, { color: colors.danger }]}>Error</Text>
-      <Text style={[typography.body, styles.errorText]}>{message}</Text>
+    <View style={[styles.center, { backgroundColor: colors.background }]}>
+      <Typography
+        type="destructive"
+        fontSize={20}
+        fontWeight="600"
+        color={colors.danger}
+      >
+        Error
+      </Typography>
+      <Typography
+        type="body"
+        fontSize={14}
+        marginTop={spacing.sm}
+        textAlign="center"
+        color={colors.textSecondary}
+      >
+        {message}
+      </Typography>
       {onRetry && (
-        <TouchableOpacity style={styles.retryButton} onPress={onRetry}>
-          <Text style={[typography.body, { color: colors.accent }]}>Retry</Text>
+        <TouchableOpacity
+          style={[styles.retryButton, { borderColor: colors.accent }]}
+          onPress={onRetry}
+        >
+          <Typography type="body" fontSize={14} color={colors.accent}>
+            Retry
+          </Typography>
         </TouchableOpacity>
       )}
     </View>
@@ -50,13 +81,21 @@ export function EmptyView({
   title?: string;
   message?: string;
 }) {
+  const { colors } = useTheme();
   return (
-    <View style={styles.center}>
-      <Text style={typography.subtitle}>{title}</Text>
+    <View style={[styles.center, { backgroundColor: colors.background }]}>
+      <Typography type="subheader" fontSize={20} fontWeight="600">
+        {title}
+      </Typography>
       {message && (
-        <Text style={[typography.bodySmall, { marginTop: spacing.sm }]}>
+        <Typography
+          type="body"
+          fontSize={12}
+          marginTop={spacing.sm}
+          color={colors.textSecondary}
+        >
           {message}
-        </Text>
+        </Typography>
       )}
     </View>
   );
@@ -65,11 +104,14 @@ export function EmptyView({
 // ── Online Badge ─────────────────────────────────────────────────
 
 export function OnlineBadge({ online }: { online: boolean }) {
+  const { colors } = useTheme();
   return (
     <View
       style={[
         styles.badge,
-        { backgroundColor: online ? colors.successSubtle : colors.dangerSubtle },
+        {
+          backgroundColor: online ? colors.successSubtle : colors.dangerSubtle,
+        },
       ]}
     >
       <View
@@ -78,14 +120,13 @@ export function OnlineBadge({ online }: { online: boolean }) {
           { backgroundColor: online ? colors.success : colors.danger },
         ]}
       />
-      <Text
-        style={[
-          typography.caption,
-          { color: online ? colors.success : colors.danger },
-        ]}
+      <Typography
+        type="caption"
+        fontSize={11}
+        color={online ? colors.success : colors.danger}
       >
         {online ? "Online" : "Offline"}
-      </Text>
+      </Typography>
     </View>
   );
 }
@@ -93,6 +134,7 @@ export function OnlineBadge({ online }: { online: boolean }) {
 // ── Update Status Chip ───────────────────────────────────────────
 
 export function UpdateStatusChip({ status }: { status: string | undefined }) {
+  const { colors } = useTheme();
   if (!status) return null;
 
   const chipColor =
@@ -104,19 +146,9 @@ export function UpdateStatusChip({ status }: { status: string | undefined }) {
 
   return (
     <View style={[styles.chip, { borderColor: chipColor }]}>
-      <Text style={[typography.caption, { color: chipColor }]}>{status}</Text>
-    </View>
-  );
-}
-
-// ── Tag Pill ─────────────────────────────────────────────────────
-
-export function TagPill({ tag }: { tag: string }) {
-  return (
-    <View style={styles.pill}>
-      <Text style={[typography.monoSmall, { color: colors.accent }]}>
-        {tag}
-      </Text>
+      <Typography type="caption" fontSize={11} color={chipColor}>
+        {status}
+      </Typography>
     </View>
   );
 }
@@ -124,7 +156,20 @@ export function TagPill({ tag }: { tag: string }) {
 // ── Card ─────────────────────────────────────────────────────────
 
 export function Card({ children }: { children: React.ReactNode }) {
-  return <View style={styles.card}>{children}</View>;
+  const { colors: themeColors } = useTheme();
+  return (
+    <View
+      style={[
+        styles.card,
+        {
+          backgroundColor: themeColors.surface,
+          borderColor: themeColors.border,
+        },
+      ]}
+    >
+      {children}
+    </View>
+  );
 }
 
 // ── Styles ───────────────────────────────────────────────────────
@@ -134,17 +179,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: colors.background,
     padding: spacing.xl,
-  },
-  loadingText: {
-    marginTop: spacing.md,
-    color: colors.textSecondary,
-  },
-  errorText: {
-    marginTop: spacing.sm,
-    color: colors.textSecondary,
-    textAlign: "center",
   },
   retryButton: {
     marginTop: spacing.lg,
@@ -152,7 +187,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: colors.accent,
   },
   badge: {
     flexDirection: "row",
@@ -173,19 +207,29 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     paddingVertical: 1,
   },
-  pill: {
-    backgroundColor: colors.surfaceHover,
-    borderRadius: radius.sm,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-  },
   card: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
+    borderWidth: StyleSheet.hairlineWidth,
     borderRadius: radius.md,
     padding: spacing.lg,
     marginHorizontal: spacing.lg,
     marginVertical: spacing.sm,
+    borderCurve: "continuous",
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    boxShadow: [
+      {
+        color: `${colors.gray["600"]}08`,
+        offsetX: 1,
+        offsetY: 4,
+        blurRadius: 8,
+        spreadDistance: 2,
+      },
+      {
+        color: `${colors.gray["600"]}10`,
+        offsetX: 0,
+        offsetY: 0,
+        blurRadius: 1,
+        spreadDistance: 0,
+      },
+    ],
   },
 });

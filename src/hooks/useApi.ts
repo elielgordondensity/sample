@@ -48,7 +48,7 @@ export function useDevices(params?: {
   page_size?: number;
 }) {
   const { token } = useAuth();
-  const { org, product } = useOrgProduct();
+  const { orgId: org, productId: product } = useOrgProduct();
   return useListDevices(org ?? "", product ?? "", params, {
     query: {
       enabled: !!token && !!org && !!product,
@@ -62,7 +62,7 @@ const PAGE_SIZE = 25;
 
 export function useInfiniteDevices(search?: string) {
   const { token } = useAuth();
-  const { org, product } = useOrgProduct();
+  const { orgId: org, productId: product } = useOrgProduct();
 
   return useInfiniteQuery({
     queryKey: getListDevicesQueryKey(
@@ -90,7 +90,7 @@ export function useInfiniteDevices(search?: string) {
 
 export function useDevice(identifier: string) {
   const { token } = useAuth();
-  const { org, product } = useOrgProduct();
+  const { orgId: org, productId: product } = useOrgProduct();
   return useGetDevice(org ?? "", product ?? "", identifier, {
     query: {
       enabled: !!token && !!org && !!product && !!identifier,
@@ -103,7 +103,7 @@ export function useDevice(identifier: string) {
 
 export function useFirmware() {
   const { token } = useAuth();
-  const { org, product } = useOrgProduct();
+  const { orgId: org, productId: product } = useOrgProduct();
   return useListFirmwares(org ?? "", product ?? "", {
     query: {
       enabled: !!token && !!org && !!product,
@@ -116,10 +116,10 @@ export function useFirmware() {
 
 export function useDeployments() {
   const { token } = useAuth();
-  const { org, product } = useOrgProduct();
-  return useListDeploymentGroups(org ?? "", product ?? "", {
+  const { orgId: orgId, productId: productId } = useOrgProduct();
+  return useListDeploymentGroups(orgId ?? "", productId ?? "", {
     query: {
-      enabled: !!token && !!org && !!product,
+      enabled: !!token && !!orgId && !!productId,
       staleTime: 30_000,
     },
   });
@@ -129,10 +129,10 @@ export function useDeployments() {
 
 export function useKeys() {
   const { token } = useAuth();
-  const { org } = useOrgProduct();
-  return useListSigningKeys(org ?? "", {
+  const { orgId: orgId } = useOrgProduct();
+  return useListSigningKeys(orgId ?? "", {
     query: {
-      enabled: !!token && !!org,
+      enabled: !!token && !!orgId,
       staleTime: 30_000,
     },
   });

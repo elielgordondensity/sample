@@ -6,6 +6,7 @@ export const STORAGE_KEYS = {
   INSTANCE_URL: "instanceUrl",
   ORG: "org",
   PRODUCT: "product",
+  THEME: "theme",
 } as const;
 
 export function getString(key: string): string | undefined {

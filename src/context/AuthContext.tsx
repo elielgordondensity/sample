@@ -13,22 +13,21 @@ import {
   resetAxios,
 } from "../api/mutator/custom-instance";
 import { deleteToken, getToken, setToken } from "../utils/secureStorage";
-import {
-  getString,
-  remove,
-  setString,
-  STORAGE_KEYS,
-} from "../utils/storage";
-import type { AuthResponse, UserResponse } from "../api/generated/schemas";
+import { getString, remove, setString, STORAGE_KEYS } from "../utils/storage";
+import type {
+  AuthResponse,
+  User,
+  UserResponse,
+} from "../api/generated/schemas";
 
 interface AuthState {
   isLoading: boolean;
   instanceUrl: string | null;
   token: string | null;
+  user: User | null;
 }
 
 interface AuthContextValue extends AuthState {
-  login: (instanceUrl: string, token: string) => Promise<void>;
   loginWithCredentials: (
     instanceUrl: string,
     email: string,
@@ -44,6 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isLoading: true,
     instanceUrl: null,
     token: null,
+    user: null,
   });
 
   // Rehydrate on boot
@@ -52,11 +52,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const token = await getToken();
       const instanceUrl = getString(STORAGE_KEYS.INSTANCE_URL) ?? null;
 
+      let user: User | null = null;
       if (token && instanceUrl) {
         configureAxios(instanceUrl, token);
+        try {
+          const res = await customInstance<UserResponse>({
+            url: "/users/me",
+            method: "GET",
+          });
+          user = res?.data ?? null;
+        } catch {
+          // Token may be expired; continue without user
+        }
       }
 
-      setState({ isLoading: false, instanceUrl, token });
+      setState({ isLoading: false, instanceUrl, token, user });
     })();
   }, []);
 
@@ -67,38 +77,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [state.instanceUrl, state.token]);
 
-  const login = useCallback(async (instanceUrl: string, token: string) => {
-    await setToken(token);
-    setString(STORAGE_KEYS.INSTANCE_URL, instanceUrl);
-    configureAxios(instanceUrl, token);
-    setState((prev) => ({ ...prev, instanceUrl, token }));
-  }, []);
-
   const loginWithCredentials = useCallback(
     async (instanceUrl: string, email: string, password: string) => {
       const authResponse = await axios.post<AuthResponse>(
-        `${instanceUrl}/api/users/auth`,
-        { email, password },
+        `${instanceUrl}/api/users/login`,
+        { email, password, note: "mobile-app" },
       );
 
-      const authToken = authResponse.data?.data?.token;
-      if (!authToken) {
+      const responseData = authResponse.data?.data;
+      const authToken = responseData?.token;
+      if (!authToken || !responseData) {
         throw new Error("No token received");
       }
 
+      const { token: _, ...user } = responseData;
+
+      await setToken(authToken);
+      setString(STORAGE_KEYS.INSTANCE_URL, instanceUrl);
       configureAxios(instanceUrl, authToken);
-      const userResponse = await customInstance<UserResponse>({
-        url: "/users/me",
-        method: "GET",
-      });
-
-      if (!userResponse?.data) {
-        throw new Error("Invalid response");
-      }
-
-      await login(instanceUrl, authToken);
+      setState((prev) => ({
+        ...prev,
+        instanceUrl,
+        token: authToken,
+        user: {
+          name: responseData.name,
+          email: responseData.email,
+        },
+      }));
     },
-    [login],
+    [],
   );
 
   const logout = useCallback(async () => {
@@ -111,17 +118,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isLoading: false,
       instanceUrl: null,
       token: null,
+      user: null,
     });
   }, []);
 
   const value = useMemo<AuthContextValue>(
     () => ({
       ...state,
-      login,
       loginWithCredentials,
       logout,
     }),
-    [state, login, loginWithCredentials, logout],
+    [state, loginWithCredentials, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

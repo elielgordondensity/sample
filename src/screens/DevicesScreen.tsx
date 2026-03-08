@@ -3,25 +3,28 @@ import {
   ActivityIndicator,
   FlatList,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import { colors, radius, spacing, typography } from "../components/tokens";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
+import { radius, spacing } from "../components/tokens";
+import { useTheme } from "../context/ThemeContext";
+import { Typography } from "../components/typography";
+import { Tag } from "../components/tag";
 import {
-  Card,
   EmptyView,
   ErrorView,
   LoadingView,
   OnlineBadge,
-  TagPill,
   UpdateStatusChip,
 } from "../components/ui";
 import { useOrgProduct } from "../context/OrgProductContext";
 import { useInfiniteDevices } from "../hooks/useApi";
 import { useDeviceChannel } from "../hooks/useDeviceChannel";
 import type { Device } from "../api/generated/schemas";
+import { PulsatingDotWithRipple } from "../components/pulsating-dot";
 
 function useDebouncedValue<T>(value: T, delay: number): T {
   const [debounced, setDebounced] = useState(value);
@@ -33,7 +36,9 @@ function useDebouncedValue<T>(value: T, delay: number): T {
 }
 
 export default function DevicesScreen() {
-  const { org, product, resetOrgAndProduct } = useOrgProduct();
+  const { colors } = useTheme();
+  const navigation = useNavigation<any>();
+  const { orgId, productId, resetOrgAndProduct } = useOrgProduct();
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebouncedValue(search, 300);
   const devicesQuery = useInfiniteDevices(debouncedSearch || undefined);
@@ -53,65 +58,109 @@ export default function DevicesScreen() {
   const devices = devicesQuery.data?.pages.flatMap((p) => p.data ?? []) ?? [];
 
   const renderDevice = ({ item }: { item: Device }) => {
-    const tags = item.tags?.split(",").map((t) => t.trim()).filter(Boolean) ?? [];
+    const tags = Array.isArray(item.tags)
+      ? item.tags
+      : typeof item.tags === "string"
+        ? item.tags
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean)
+        : [];
 
     return (
-      <Card>
-        <View style={styles.deviceHeader}>
-          <Text style={typography.subtitle}>
-            {String(item.identifier)}
-          </Text>
-          <OnlineBadge online={item.online ?? false} />
-        </View>
-
-        {item.description ? (
-          <Text style={[typography.bodySmall, { marginTop: spacing.xs }]}>
-            {item.description}
-          </Text>
-        ) : null}
-
-        <View style={styles.metaRow}>
-          {item.firmware_metadata?.firmware_version && (
-            <Text style={typography.mono}>
-              v{item.firmware_metadata.firmware_version}
-            </Text>
-          )}
-          <UpdateStatusChip status={item.version} />
-        </View>
-
-        {item.firmware_metadata?.firmware_uuid && (
-          <Text style={[typography.monoSmall, { marginTop: spacing.xs }]}>
-            {item.firmware_metadata.firmware_uuid}
-          </Text>
-        )}
-
-        {tags.length > 0 && (
-          <View style={styles.tagsRow}>
-            {tags.map((tag) => (
-              <TagPill key={tag} tag={tag} />
-            ))}
+      <TouchableOpacity
+        activeOpacity={0.7}
+        style={[styles.row, { borderBottomColor: colors.border }]}
+        onPress={() =>
+          navigation.navigate("DeviceDetail", {
+            identifier: String(item.identifier),
+          })
+        }
+      >
+        <View style={styles.rowContent}>
+          <View style={styles.deviceHeader}>
+            <Typography type="header" fontSize={15} fontWeight="600">
+              {String(item.identifier)}
+            </Typography>
+            <Tag
+              label={item.online ? "Online" : "Offline"}
+              iconLeft={{ component: PulsatingDotWithRipple }}
+            />
+            <OnlineBadge online={item.online ?? false} />
           </View>
-        )}
-      </Card>
+
+          {item.description ? (
+            <Typography
+              type="body"
+              fontSize={12}
+              marginTop={spacing.xs}
+              color={colors.textSecondary}
+            >
+              {item.description}
+            </Typography>
+          ) : null}
+
+          {item.version && (
+            <Typography
+              type="subheader"
+              fontType="regular"
+              fontSize={14}
+              lineHeight={26}
+              color={colors.textSecondary}
+            >
+              v{item.version}
+            </Typography>
+          )}
+          {/*<UpdateStatusChip status={item.version} />*/}
+
+          {tags.length > 0 && (
+            <View style={styles.tagsRow}>
+              {tags.map((tag) => (
+                <Tag key={tag} label={tag} colorScheme="gray" size="sm" />
+              ))}
+            </View>
+          )}
+        </View>
+      </TouchableOpacity>
     );
   };
 
-  return (
-    <View style={styles.container}>
+  const listHeader = (
+    <>
       <View style={styles.headerRow}>
         <View>
-          <Text style={typography.title}>Devices</Text>
-          <Text style={typography.bodySmall}>
-            {org} / {product}
-          </Text>
+          <Typography
+            type="header"
+            fontSize={26}
+            fontWeight="600"
+            lineHeight={28}
+            marginBottom={4}
+          >
+            Devices
+          </Typography>
+          <Typography type="body" fontSize={12} color={colors.textSecondary}>
+            {orgId} / {productId}
+          </Typography>
         </View>
-        <TouchableOpacity style={styles.swapButton} onPress={resetOrgAndProduct}>
-          <Text style={styles.swapText}>Switch</Text>
+        <TouchableOpacity
+          style={[styles.swapButton, { borderColor: colors.accent }]}
+          onPress={resetOrgAndProduct}
+        >
+          <Typography type="body" fontSize={14} color={colors.accent}>
+            Switch
+          </Typography>
         </TouchableOpacity>
       </View>
 
       <TextInput
-        style={styles.searchInput}
+        style={[
+          styles.searchInput,
+          {
+            backgroundColor: colors.surface,
+            borderColor: colors.border,
+            color: colors.textPrimary,
+          },
+        ]}
         value={search}
         onChangeText={setSearch}
         placeholder="Search devices…"
@@ -119,42 +168,51 @@ export default function DevicesScreen() {
         autoCapitalize="none"
         autoCorrect={false}
       />
+    </>
+  );
 
-      {devices.length === 0 ? (
-        <EmptyView
-          title="No Devices"
-          message={search ? "No devices match your search." : "No devices found for this product."}
-        />
-      ) : (
-        <FlatList
-          data={devices}
-          keyExtractor={(item) => String(item.identifier)}
-          renderItem={renderDevice}
-          contentContainerStyle={styles.list}
-          onEndReached={() => {
-            if (devicesQuery.hasNextPage && !devicesQuery.isFetchingNextPage) {
-              devicesQuery.fetchNextPage();
+  return (
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
+      <FlatList
+        data={devices}
+        keyExtractor={(item) => String(item.identifier)}
+        renderItem={renderDevice}
+        contentContainerStyle={styles.list}
+        ListHeaderComponent={listHeader}
+        ListEmptyComponent={
+          <EmptyView
+            title="No Devices"
+            message={
+              search
+                ? "No devices match your search."
+                : "No devices found for this product."
             }
-          }}
-          onEndReachedThreshold={0.5}
-          ListFooterComponent={
-            devicesQuery.isFetchingNextPage ? (
-              <ActivityIndicator
-                style={styles.loadingFooter}
-                color={colors.accent}
-              />
-            ) : null
+          />
+        }
+        onEndReached={() => {
+          if (devicesQuery.hasNextPage && !devicesQuery.isFetchingNextPage) {
+            devicesQuery.fetchNextPage();
           }
-        />
-      )}
-    </View>
+        }}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={
+          devicesQuery.isFetchingNextPage ? (
+            <ActivityIndicator
+              style={styles.loadingFooter}
+              color={colors.accent}
+            />
+          ) : null
+        }
+      />
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   headerRow: {
     flexDirection: "row",
@@ -166,24 +224,16 @@ const styles = StyleSheet.create({
   },
   swapButton: {
     borderWidth: 1,
-    borderColor: colors.accent,
     borderRadius: radius.md,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
   },
-  swapText: {
-    ...typography.body,
-    color: colors.accent,
-  },
   searchInput: {
-    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: colors.border,
     borderRadius: radius.md,
     padding: spacing.md,
     marginHorizontal: spacing.lg,
     marginBottom: spacing.sm,
-    color: colors.textPrimary,
     fontSize: 14,
   },
   list: {
@@ -191,6 +241,16 @@ const styles = StyleSheet.create({
   },
   loadingFooter: {
     paddingVertical: spacing.lg,
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  rowContent: {
+    flex: 1,
   },
   deviceHeader: {
     flexDirection: "row",

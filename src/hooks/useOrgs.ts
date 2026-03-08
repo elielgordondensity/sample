@@ -8,6 +8,7 @@ import { useAuth } from "../context/AuthContext";
  */
 export function useOrgs() {
   const { token } = useAuth();
+
   return useQuery({
     queryKey: ["/orgs"],
     queryFn: ({ signal }) =>

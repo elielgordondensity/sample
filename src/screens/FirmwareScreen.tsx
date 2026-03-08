@@ -1,11 +1,15 @@
 import React from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
-import { colors, spacing, typography } from "../components/tokens";
-import { Card, EmptyView, ErrorView, LoadingView } from "../components/ui";
+import { FlatList, StyleSheet, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { spacing } from "../components/tokens";
+import { useTheme } from "../context/ThemeContext";
+import { Typography } from "../components/typography";
+import { EmptyView, ErrorView, LoadingView } from "../components/ui";
 import { useFirmware } from "../hooks/useApi";
 import type { Firmware } from "../api/generated/schemas";
 
 export default function FirmwareScreen() {
+  const { colors } = useTheme();
   const firmwareQuery = useFirmware();
 
   if (firmwareQuery.isLoading)
@@ -25,28 +29,35 @@ export default function FirmwareScreen() {
   });
 
   const renderFirmware = ({ item }: { item: Firmware }) => (
-    <Card>
+    <View style={[styles.row, { borderBottomColor: colors.border }]}>
       <View style={styles.headerRow}>
-        <Text style={typography.subtitle}>v{item.version ?? "?"}</Text>
+        <Typography type="subheader" fontSize={20} fontWeight="600" lineHeight={28}>
+          v{item.version ?? "?"}
+        </Typography>
         <View style={styles.badges}>
           {item.signed && (
-            <View style={styles.signedBadge}>
-              <Text style={styles.signedText}>Signed</Text>
+            <View
+              style={[
+                styles.signedBadge,
+                { backgroundColor: colors.successSubtle },
+              ]}
+            >
+              <Typography type="caption" fontSize={11} color={colors.success}>
+                Signed
+              </Typography>
             </View>
           )}
         </View>
       </View>
 
       {item.description ? (
-        <Text style={[typography.bodySmall, { marginTop: spacing.xs }]}>
+        <Typography type="body" fontSize={12} marginTop={spacing.xs} color={colors.textSecondary}>
           {item.description}
-        </Text>
+        </Typography>
       ) : null}
 
       <View style={styles.metaGrid}>
-        {item.platform && (
-          <MetaItem label="Platform" value={item.platform} />
-        )}
+        {item.platform && <MetaItem label="Platform" value={item.platform} />}
         {item.architecture && (
           <MetaItem label="Arch" value={item.architecture} />
         )}
@@ -54,44 +65,58 @@ export default function FirmwareScreen() {
       </View>
 
       {item.uuid && (
-        <Text style={[typography.monoSmall, { marginTop: spacing.sm }]}>
+        <Typography type="caption" fontType="mono" fontSize={10} marginTop={spacing.sm} color={colors.textTertiary}>
           {item.uuid}
-        </Text>
+        </Typography>
       )}
 
       {item.inserted_at && (
-        <Text style={[typography.caption, { marginTop: spacing.xs }]}>
+        <Typography type="caption" fontSize={11} marginTop={spacing.xs} color={colors.textTertiary}>
           {new Date(item.inserted_at).toLocaleDateString()}
-        </Text>
-      )}
-    </Card>
-  );
-
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Firmware</Text>
-      {firmwares.length === 0 ? (
-        <EmptyView
-          title="No Firmware"
-          message="No firmware has been uploaded for this product."
-        />
-      ) : (
-        <FlatList
-          data={firmwares}
-          keyExtractor={(item) => item.uuid ?? String(Math.random())}
-          renderItem={renderFirmware}
-          contentContainerStyle={styles.list}
-        />
+        </Typography>
       )}
     </View>
+  );
+
+  function renderListHeader() {
+    return (
+      <Typography type="header" fontSize={26} fontWeight="600" lineHeight={28} marginBottom={4} paddingHorizontal={spacing.lg} paddingTop={spacing.lg} paddingBottom={spacing.md}>
+        Firmware
+      </Typography>
+    );
+  }
+
+  return (
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
+      <FlatList
+        data={firmwares}
+        keyExtractor={(item) => item.uuid ?? String(Math.random())}
+        renderItem={renderFirmware}
+        ListHeaderComponent={renderListHeader}
+        ListEmptyComponent={
+          <EmptyView
+            title="No Firmware"
+            message="No firmware has been uploaded for this product."
+          />
+        }
+        contentContainerStyle={styles.list}
+      />
+    </SafeAreaView>
   );
 }
 
 function MetaItem({ label, value }: { label: string; value: string }) {
+  const { colors } = useTheme();
   return (
     <View style={styles.metaItem}>
-      <Text style={typography.caption}>{label}</Text>
-      <Text style={typography.mono}>{value}</Text>
+      <Typography type="caption" fontSize={11} color={colors.textTertiary}>
+        {label}
+      </Typography>
+      <Typography type="body" fontType="mono" fontSize={12} color={colors.textSecondary}>
+        {value}
+      </Typography>
     </View>
   );
 }
@@ -99,16 +124,14 @@ function MetaItem({ label, value }: { label: string; value: string }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
-  },
-  title: {
-    ...typography.title,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.md,
   },
   list: {
     paddingBottom: spacing.xl,
+  },
+  row: {
+    marginHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   headerRow: {
     flexDirection: "row",
@@ -120,14 +143,9 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   signedBadge: {
-    backgroundColor: colors.successSubtle,
     borderRadius: 4,
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
-  },
-  signedText: {
-    ...typography.caption,
-    color: colors.success,
   },
   metaGrid: {
     flexDirection: "row",

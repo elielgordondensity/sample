@@ -4,16 +4,18 @@ import {
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import { colors, radius, spacing, typography } from "../components/tokens";
+import { radius, spacing } from "../components/tokens";
+import { useTheme } from "../context/ThemeContext";
+import { Typography } from "../components/typography";
 import { LoadingView } from "../components/ui";
 import { useAuth } from "../context/AuthContext";
 
 export default function LoginScreen() {
+  const { colors } = useTheme();
   const { loginWithCredentials } = useAuth();
   const [instanceUrl, setInstanceUrl] = useState("");
   const [email, setEmail] = useState("");
@@ -46,19 +48,34 @@ export default function LoginScreen() {
 
   if (loading) return <LoadingView message="Validating credentials…" />;
 
+  const inputStyle = [
+    styles.input,
+    {
+      backgroundColor: colors.surface,
+      borderColor: colors.border,
+      color: colors.textPrimary,
+    },
+  ];
+
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.background }]}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <View style={styles.content}>
-        <Text style={styles.title}>NervesHub</Text>
-        <Text style={styles.subtitle}>Sign in to your instance</Text>
+        <Typography type="header" fontSize={32} textAlign="center" color={colors.accent}>
+          NervesHub
+        </Typography>
+        <Typography type="body" fontSize={12} textAlign="center" marginTop={spacing.sm} marginBottom={spacing.xxl} color={colors.textSecondary}>
+          Sign in to your instance
+        </Typography>
 
         <View style={styles.field}>
-          <Text style={styles.label}>Instance URL</Text>
+          <Typography type="body" fontSize={12} marginBottom={spacing.xs} color={colors.textSecondary}>
+            Instance URL
+          </Typography>
           <TextInput
-            style={styles.input}
+            style={inputStyle}
             value={instanceUrl}
             onChangeText={setInstanceUrl}
             placeholder="https://manage.nervescloud.com"
@@ -70,9 +87,11 @@ export default function LoginScreen() {
         </View>
 
         <View style={styles.field}>
-          <Text style={styles.label}>Email</Text>
+          <Typography type="body" fontSize={12} marginBottom={spacing.xs} color={colors.textSecondary}>
+            Email
+          </Typography>
           <TextInput
-            style={styles.input}
+            style={inputStyle}
             value={email}
             onChangeText={setEmail}
             placeholder="user@example.com"
@@ -84,9 +103,11 @@ export default function LoginScreen() {
         </View>
 
         <View style={styles.field}>
-          <Text style={styles.label}>Password</Text>
+          <Typography type="body" fontSize={12} marginBottom={spacing.xs} color={colors.textSecondary}>
+            Password
+          </Typography>
           <TextInput
-            style={styles.input}
+            style={inputStyle}
             value={password}
             onChangeText={setPassword}
             placeholder="Enter your password"
@@ -97,8 +118,13 @@ export default function LoginScreen() {
           />
         </View>
 
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Sign In</Text>
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: colors.accent }]}
+          onPress={handleLogin}
+        >
+          <Typography type="subheader" fontSize={20} fontWeight="600" color={colors.white}>
+            Sign In
+          </Typography>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
@@ -108,51 +134,25 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   content: {
     flex: 1,
     justifyContent: "center",
     paddingHorizontal: spacing.xl,
   },
-  title: {
-    ...typography.title,
-    fontSize: 32,
-    textAlign: "center",
-    color: colors.accent,
-  },
-  subtitle: {
-    ...typography.bodySmall,
-    textAlign: "center",
-    marginTop: spacing.sm,
-    marginBottom: spacing.xxl,
-  },
   field: {
     marginBottom: spacing.lg,
   },
-  label: {
-    ...typography.bodySmall,
-    marginBottom: spacing.xs,
-    color: colors.textSecondary,
-  },
   input: {
-    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: colors.border,
     borderRadius: radius.md,
     padding: spacing.md,
-    color: colors.textPrimary,
     fontSize: 16,
   },
   button: {
-    backgroundColor: colors.accent,
     borderRadius: radius.md,
     paddingVertical: spacing.md,
     alignItems: "center",
     marginTop: spacing.lg,
-  },
-  buttonText: {
-    ...typography.subtitle,
-    color: colors.white,
   },
 });

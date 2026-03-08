@@ -1,11 +1,16 @@
 import React from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
-import { colors, radius, spacing, typography } from "../components/tokens";
-import { Card, EmptyView, ErrorView, LoadingView, TagPill } from "../components/ui";
+import { FlatList, StyleSheet, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { radius, spacing } from "../components/tokens";
+import { useTheme } from "../context/ThemeContext";
+import { Typography } from "../components/typography";
+import { EmptyView, ErrorView, LoadingView } from "../components/ui";
+import { Tag } from "../components/tag";
 import { useDeployments } from "../hooks/useApi";
 import type { DeploymentGroup } from "../api/generated/schemas";
 
 export default function DeploymentsScreen() {
+  const { colors } = useTheme();
   const deploymentsQuery = useDeployments();
 
   if (deploymentsQuery.isLoading)
@@ -18,23 +23,27 @@ export default function DeploymentsScreen() {
       />
     );
 
-  const deployments = [...(deploymentsQuery.data?.data ?? [])].sort(
-    (a, b) => {
-      // Active first
-      if (a.is_active && !b.is_active) return -1;
-      if (!a.is_active && b.is_active) return 1;
-      return 0;
-    },
-  );
+  const deployments = [...(deploymentsQuery.data?.data ?? [])].sort((a, b) => {
+    if (a.is_active && !b.is_active) return -1;
+    if (!a.is_active && b.is_active) return 1;
+    return 0;
+  });
 
   const renderDeployment = ({ item }: { item: DeploymentGroup }) => {
     const isActive = item.is_active ?? item.state === "on";
     const tags = item.conditions?.tags ?? [];
 
     return (
-      <Card>
+      <View style={[styles.row, { borderBottomColor: colors.border }]}>
         <View style={styles.headerRow}>
-          <Text style={typography.subtitle}>{item.name}</Text>
+          <Typography
+            type="subheader"
+            fontSize={20}
+            fontWeight="600"
+            lineHeight={28}
+          >
+            {item.name}
+          </Typography>
           <View
             style={[
               styles.stateIndicator,
@@ -55,86 +64,135 @@ export default function DeploymentsScreen() {
                 },
               ]}
             />
-            <Text
-              style={[
-                typography.caption,
-                {
-                  color: isActive ? colors.success : colors.textTertiary,
-                },
-              ]}
+            <Typography
+              type="caption"
+              fontSize={11}
+              color={isActive ? colors.success : colors.textTertiary}
             >
               {isActive ? "Active" : "Inactive"}
-            </Text>
+            </Typography>
           </View>
         </View>
 
         {item.firmware?.version && (
           <View style={styles.firmwareRow}>
-            <Text style={typography.caption}>Firmware</Text>
-            <Text style={typography.mono}>v{item.firmware.version}</Text>
+            <Typography
+              type="caption"
+              fontSize={11}
+              color={colors.textTertiary}
+            >
+              Firmware
+            </Typography>
+            <Typography
+              type="body"
+              fontType="mono"
+              fontSize={12}
+              color={colors.textSecondary}
+            >
+              v{item.firmware.version}
+            </Typography>
           </View>
         )}
 
         {item.conditions?.version && (
           <View style={styles.conditionRow}>
-            <Text style={typography.caption}>Version</Text>
-            <Text style={typography.mono}>{item.conditions.version}</Text>
+            <Typography
+              type="caption"
+              fontSize={11}
+              color={colors.textTertiary}
+            >
+              Version
+            </Typography>
+            <Typography
+              type="body"
+              fontType="mono"
+              fontSize={12}
+              color={colors.textSecondary}
+            >
+              {item.conditions.version}
+            </Typography>
           </View>
         )}
 
         {tags.length > 0 && (
           <View style={styles.tagsRow}>
-            <Text style={[typography.caption, { marginRight: spacing.sm }]}>
+            <Typography
+              type="caption"
+              fontSize={11}
+              marginRight={spacing.sm}
+              color={colors.textTertiary}
+            >
               Tags
-            </Text>
+            </Typography>
             {tags.map((tag) => (
-              <TagPill key={tag} tag={tag} />
+              <Tag key={tag} label={tag} size="sm" colorScheme="red" />
             ))}
           </View>
         )}
 
         {item.device_count != null && (
-          <Text style={[typography.bodySmall, { marginTop: spacing.sm }]}>
+          <Typography
+            type="body"
+            fontSize={12}
+            marginTop={spacing.sm}
+            color={colors.textTertiary}
+          >
             {item.device_count} device{item.device_count !== 1 ? "s" : ""}
-          </Text>
+          </Typography>
         )}
-      </Card>
+      </View>
     );
   };
 
+  function renderListHeader() {
+    return (
+      <Typography
+        type="header"
+        fontSize={26}
+        fontWeight="600"
+        lineHeight={28}
+        marginBottom={4}
+        paddingHorizontal={spacing.lg}
+        paddingTop={spacing.lg}
+        paddingBottom={spacing.md}
+      >
+        Deployments
+      </Typography>
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Deployments</Text>
-      {deployments.length === 0 ? (
-        <EmptyView
-          title="No Deployments"
-          message="No deployment groups exist for this product."
-        />
-      ) : (
-        <FlatList
-          data={deployments}
-          keyExtractor={(item) => String(item.id ?? item.name)}
-          renderItem={renderDeployment}
-          contentContainerStyle={styles.list}
-        />
-      )}
-    </View>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
+      <FlatList
+        data={deployments}
+        keyExtractor={(item) => String(item.id ?? item.name)}
+        renderItem={renderDeployment}
+        ListHeaderComponent={renderListHeader}
+        ListEmptyComponent={
+          <EmptyView
+            title="No Deployments"
+            message="No deployment groups exist for this product."
+          />
+        }
+        contentContainerStyle={styles.list}
+      />
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
-  },
-  title: {
-    ...typography.title,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.md,
   },
   list: {
     paddingBottom: spacing.xl,
+  },
+  row: {
+    marginHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   headerRow: {
     flexDirection: "row",

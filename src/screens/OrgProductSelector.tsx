@@ -1,69 +1,118 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   ScrollView,
   StyleSheet,
-  Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import { colors, radius, spacing, typography } from "../components/tokens";
+import { radius, spacing } from "../components/tokens";
+import { useTheme } from "../context/ThemeContext";
+import { Typography } from "../components/typography";
 import { EmptyView, ErrorView, LoadingView } from "../components/ui";
 import { useAuth } from "../context/AuthContext";
 import { useOrgProduct } from "../context/OrgProductContext";
-import { useAllOrgProducts } from "../hooks/useApi";
+import { useProducts } from "../hooks/useApi";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function OrgProductSelector() {
+  const { colors } = useTheme();
   const { logout } = useAuth();
   const { selectOrgAndProduct } = useOrgProduct();
-  const { data: orgGroups, isLoading, isError, refetch } = useAllOrgProducts();
-
-  if (isLoading) return <LoadingView message="Loading products…" />;
-  if (isError)
-    return (
-      <ErrorView message="Failed to load products" onRetry={refetch} />
-    );
-  if (orgGroups.length === 0)
-    return (
-      <EmptyView
-        title="No Products"
-        message="You don't belong to any organizations with products."
-      />
-    );
+  const [orgName, setOrgName] = useState("");
+  const submittedOrg = orgName.trim() || null;
+  const { data, isLoading, isError, refetch } = useProducts(submittedOrg);
+  const products = data?.data ?? [];
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
-        <Text style={styles.title}>Select Product</Text>
+        <Typography type="header" fontSize={26} fontWeight="600" lineHeight={28} paddingBottom={spacing.md}>
+          Select Product
+        </Typography>
         <TouchableOpacity onPress={logout}>
-          <Text style={styles.logoutText}>Logout</Text>
+          <Typography type="destructive" fontSize={14} color={colors.danger}>
+            Logout
+          </Typography>
         </TouchableOpacity>
       </View>
 
-      <ScrollView contentContainerStyle={styles.list}>
-        {orgGroups.map((group) => (
-          <View key={group.org} style={styles.orgSection}>
-            <Text style={styles.orgName}>{group.org}</Text>
-            {group.products.map((product) => (
-              <TouchableOpacity
-                key={`${group.org}:${product.name}`}
-                style={styles.card}
-                onPress={() => selectOrgAndProduct(group.org, product.name)}
-              >
-                <Text style={typography.subtitle}>{product.name}</Text>
-                <Text style={styles.arrow}>›</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        ))}
-      </ScrollView>
-    </View>
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={[
+            styles.input,
+            {
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+              color: colors.textPrimary,
+            },
+          ]}
+          placeholder="Organization name"
+          placeholderTextColor={colors.textTertiary}
+          value={orgName}
+          onChangeText={setOrgName}
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+      </View>
+
+      {!submittedOrg ? (
+        <EmptyView
+          title="Enter Organization"
+          message="Type your organization name above to see its products."
+        />
+      ) : isLoading ? (
+        <LoadingView message="Loading products…" />
+      ) : isError ? (
+        <ErrorView message="Failed to load products" onRetry={refetch} />
+      ) : products.length === 0 ? (
+        <EmptyView
+          title="No Products"
+          message={`No products found for "${submittedOrg}".`}
+        />
+      ) : (
+        <ScrollView contentContainerStyle={styles.list}>
+          <Typography
+            type="caption"
+            fontSize={11}
+            textTransform="uppercase"
+            letterSpacing={1}
+            paddingHorizontal={spacing.lg}
+            paddingTop={spacing.md}
+            paddingBottom={spacing.xs}
+            color={colors.textTertiary}
+          >
+            {submittedOrg}
+          </Typography>
+          {products.map((product) => (
+            <TouchableOpacity
+              key={product.name}
+              style={[
+                styles.card,
+                {
+                  backgroundColor: colors.surface,
+                  borderColor: colors.border,
+                },
+              ]}
+              onPress={() => selectOrgAndProduct(submittedOrg, product.name)}
+            >
+              <Typography type="subheader" fontSize={20} fontWeight="600" lineHeight={28}>
+                {product.name}
+              </Typography>
+              <Typography type="header" fontSize={26} color={colors.textTertiary}>
+                ›
+              </Typography>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      )}
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   header: {
     flexDirection: "row",
@@ -73,43 +122,27 @@ const styles = StyleSheet.create({
     paddingTop: spacing.lg,
     paddingBottom: spacing.sm,
   },
-  title: {
-    ...typography.title,
+  inputContainer: {
+    paddingHorizontal: spacing.lg,
     paddingBottom: spacing.md,
   },
-  logoutText: {
-    ...typography.body,
-    color: colors.danger,
+  input: {
+    fontSize: 14,
+    borderWidth: 1,
+    borderRadius: radius.md,
+    padding: spacing.md,
   },
   list: {
     paddingBottom: spacing.xl,
-  },
-  orgSection: {
-    marginBottom: spacing.md,
-  },
-  orgName: {
-    ...typography.caption,
-    color: colors.textTertiary,
-    textTransform: "uppercase",
-    letterSpacing: 1,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.xs,
   },
   card: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: colors.border,
     borderRadius: radius.md,
     padding: spacing.lg,
     marginHorizontal: spacing.lg,
     marginVertical: spacing.xs,
-  },
-  arrow: {
-    ...typography.title,
-    color: colors.textTertiary,
   },
 });

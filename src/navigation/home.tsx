@@ -1,27 +1,56 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createNativeBottomTabNavigator } from "@bottom-tabs/react-navigation";
-import { colors } from "../components/tokens";
-import { useHasOrgProduct, useNeedsOrgProduct } from "../context/OrgProductContext";
+import {
+  useHasOrgProduct,
+  useNeedsOrgProduct,
+} from "../context/OrgProductContext";
 
 import OrgProductSelector from "../screens/OrgProductSelector";
 import DevicesScreen from "../screens/DevicesScreen";
+import DeviceDetailScreen from "../screens/DeviceDetailScreen";
 import FirmwareScreen from "../screens/FirmwareScreen";
 import DeploymentsScreen from "../screens/DeploymentsScreen";
+import SettingsScreen from "../screens/SettingsScreen";
+import { colors } from "../theme/colors";
+
+// ── Devices stack (list + detail) ────────────────────────────────
+
+const DevicesStack = createNativeStackNavigator({
+  screens: {
+    DevicesList: {
+      screen: DevicesScreen,
+      options: { headerShown: false },
+    },
+    DeviceDetail: {
+      screen: DeviceDetailScreen,
+      options: {
+        title: "Device",
+        headerTransparent: true,
+        headerBlurEffect: "systemMaterial",
+      },
+    },
+  },
+});
 
 // ── Main tabs (native platform tabs) ─────────────────────────────
 
 const MainTabs = createNativeBottomTabNavigator({
-  screenOptions: {
-    headerShown: false,
-    tabBarActiveTintColor: colors.accent,
-    tabBarInactiveTintColor: colors.textTertiary,
-  },
+  sidebarAdaptable: false,
+  scrollEdgeAppearance: "opaque",
+  translucent: true,
+  tabBarActiveTintColor: colors.amber[4],
+  tabBarInactiveTintColor: colors.gray[300],
+  // tabLabelStyle: {
+  //   fontSize: 10,
+  //   fontWeight: "700",
+  //   fontFamily: "Plus Jakarta Sans",
+  // },
   screens: {
     Devices: {
-      screen: DevicesScreen,
+      screen: DevicesStack,
       options: {
         tabBarIcon: ({ focused }) => ({
-          sfSymbol: focused ? "iphone" : "iphone",
+          sfSymbol: focused ? "cpu.fill" : "cpu",
         }),
       },
     },
@@ -38,6 +67,14 @@ const MainTabs = createNativeBottomTabNavigator({
       options: {
         tabBarIcon: ({ focused }) => ({
           sfSymbol: focused ? "paperplane.fill" : "paperplane",
+        }),
+      },
+    },
+    Settings: {
+      screen: SettingsScreen,
+      options: {
+        tabBarIcon: ({ focused }) => ({
+          sfSymbol: focused ? "gearshape.fill" : "gearshape",
         }),
       },
     },
