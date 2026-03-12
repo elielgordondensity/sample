@@ -103,7 +103,10 @@ export type ColorTheme = {
   background: string;
   backgroundSecondary: string;
   backgroundTertiary: string;
+  surface: string;
+  surfaceHover: string;
   border: string;
+  borderLight: string;
   inputBorder: string;
   textHeader: string;
   textSubHeader: string;
@@ -111,6 +114,20 @@ export type ColorTheme = {
   textCaption: string;
   textDestructive: string;
   textHighlight: string;
+  textPrimary: string;
+  textSecondary: string;
+  textTertiary: string;
+  textPlaceholder: string;
+  accent: string;
+  accentEmphasis: string;
+  success: string;
+  successSubtle: string;
+  danger: string;
+  dangerSubtle: string;
+  warning: string;
+  warningSubtle: string;
+  white: string;
+  black: string;
   colors: {
     primary: string;
     secondary: string;
@@ -126,10 +143,13 @@ export type ColorTheme = {
 };
 
 export const COLORS_LIGHT: ColorTheme = {
-  background: "rgb(254, 249, 243)",
-  backgroundSecondary: "rgba(255, 255, 255, 0.6)",
-  backgroundTertiary: "rgba(255, 255, 255, 0.9)",
-  border: "white",
+  background: "#F4F5F6",
+  backgroundSecondary: "rgba(255, 255, 255, 0.95)",
+  backgroundTertiary: "rgba(240, 240, 240, 0.9)",
+  surface: "#F6F8FA",
+  surfaceHover: "#EAEEF2",
+  border: "#D0D7DE",
+  borderLight: "#E1E4E8",
   inputBorder: "#E0E0E0",
   textHeader: "#121B03F5",
   textSubHeader: "#67727E",
@@ -137,6 +157,20 @@ export const COLORS_LIGHT: ColorTheme = {
   textCaption: "#929BA5",
   textHighlight: "#007AFF",
   textDestructive: colors.red["500"],
+  textPrimary: colors.gray[700],
+  textSecondary: "#656D76",
+  textTertiary: "#8C959F",
+  textPlaceholder: "#B0B8C1",
+  accent: "#6366F1",
+  accentEmphasis: "#4F46E5",
+  success: "#1A7F37",
+  successSubtle: "#DAFBE1",
+  danger: "#CF222E",
+  dangerSubtle: "#FFEBE9",
+  warning: "#9A6700",
+  warningSubtle: "#FFF8C5",
+  white: "#FFFFFF",
+  black: "#010409",
   colors: {
     primary: "#1D2C38",
     secondary: colors.amber[3],
@@ -152,21 +186,38 @@ export const COLORS_LIGHT: ColorTheme = {
 };
 
 export const COLORS_DARK: ColorTheme = {
-  background: colors.gray["carbono"],
-  backgroundSecondary: colors.gray["800"],
-  backgroundTertiary: colors.gray["100"],
-  border: colors.gray["700"],
-  inputBorder: colors.gray["700"],
-  textHeader: "#E6F1FF",
-  textSubHeader: "#E6F1FF",
-  textBody: "#E6F1FF",
-  textCaption: "#929BA5",
-  textHighlight: "#007AFF",
-  textDestructive: colors.red["500"],
+  background: "#0D1117",
+  backgroundSecondary: "#161B22",
+  backgroundTertiary: "#1C2128",
+  surface: "#1C2128",
+  surfaceHover: "#242B35",
+  border: "#30363D",
+  borderLight: "#272D34",
+  inputBorder: "#30363D",
+  textHeader: "#F0F3F6",
+  textSubHeader: "#C9D1D9",
+  textBody: "#E6EDF3",
+  textCaption: "#8B949E",
+  textHighlight: "#58A6FF",
+  textDestructive: colors.red["400"],
+  textPrimary: "#F0F3F6",
+  textSecondary: "#C9D1D9",
+  textTertiary: "#8B949E",
+  textPlaceholder: "#484F58",
+  accent: "#818CF8",
+  accentEmphasis: "#6366F1",
+  success: "#3FB950",
+  successSubtle: "#1A4731",
+  danger: "#F85149",
+  dangerSubtle: "#4A1E1E",
+  warning: "#D29922",
+  warningSubtle: "#3D2E00",
+  white: "#FFFFFF",
+  black: "#010409",
   colors: {
     primary: colors.blue["500"],
     secondary: colors.orange["500"],
-    background: colors.gray["carbono"],
+    background: "#0D1117",
   },
   sensorHealth: {
     healthy: colors.green["500"],

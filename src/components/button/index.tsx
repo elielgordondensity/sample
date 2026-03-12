@@ -16,8 +16,9 @@ import Animated, {
 import { Typography } from '../typography';
 import { LoadingIndicator } from '../loading-indicator';
 import useThemedStyles from '../../theme/useThemedStyles';
+import { useTheme } from '../../theme/ThemeProvider';
 import { ColorTheme } from '../../theme/colors';
-import { BUTTON_SIZES, BUTTON_VARIANTS } from './config';
+import { BUTTON_SIZES, getButtonVariants } from './config';
 import { LiquidGlassView, isLiquidGlassSupported} from '@callstack/liquid-glass';
 
 type ButtonType =
@@ -61,7 +62,9 @@ export function Button(props: ButtonProps) {
     ...rest
   } = props;
 
+  const { isDark } = useTheme();
   const themedStyles = useThemedStyles(createStyles);
+  const variants = useMemo(() => getButtonVariants(isDark), [isDark]);
 
   const scale = useSharedValue(1);
 
@@ -74,7 +77,7 @@ export function Button(props: ButtonProps) {
   // Memoize expensive style calculations
   const styleConfig = useMemo(() => {
     const sizeConfig = BUTTON_SIZES[size];
-    const variantConfig = BUTTON_VARIANTS[type];
+    const variantConfig = variants[type];
     const borderRadius = pill
       ? sizeConfig.borderRadius
       : type === 'icon'
@@ -83,7 +86,7 @@ export function Button(props: ButtonProps) {
     const finalTextColor = textColor || variantConfig.textColor;
 
     return { sizeConfig, variantConfig, borderRadius, finalTextColor };
-  }, [size, type, pill, textColor]);
+  }, [size, type, pill, textColor, variants]);
 
   const containerStyle = useMemo(
     () => [
@@ -103,7 +106,7 @@ export function Button(props: ButtonProps) {
       type === 'icon' && {
         width: styleConfig.sizeConfig.height,
         height: styleConfig.sizeConfig.height,
-        backgroundColor: 'rgba(255, 255, 255, 0.6)',
+        backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.6)',
         borderWidth: 0,
         padding: 0,
       },
@@ -214,12 +217,12 @@ export function Button(props: ButtonProps) {
   );
 }
 
-const createStyles = (_theme: ColorTheme) =>
+const createStyles = (theme: ColorTheme) =>
   StyleSheet.create({
     container: {
       height: 60,
       borderCurve: 'continuous',
-      backgroundColor: '#121921',
+      backgroundColor: theme.colors.primary,
       justifyContent: 'center',
       alignItems: 'center',
       zIndex: 10,

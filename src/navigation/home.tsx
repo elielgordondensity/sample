@@ -5,40 +5,26 @@ import {
   useNeedsOrgProduct,
 } from "../context/OrgProductContext";
 
-import OrgProductSelector from "../screens/OrgProductSelector";
-import DevicesScreen from "../screens/DevicesScreen";
-import DeviceDetailScreen from "../screens/DeviceDetailScreen";
-import FirmwareScreen from "../screens/FirmwareScreen";
-import DeploymentsScreen from "../screens/DeploymentsScreen";
-import SettingsScreen from "../screens/SettingsScreen";
+import OrgProductSelector from "../screens/org-product-selector";
+import FirmwareStack from "./firmware";
+import DeploymentsStack from "./deployments";
+import SettingsScreen from "../screens/settings-screen";
+import ScriptsScreen from "../screens/scripts-screen";
+import DevicesStack from "./devices";
 import { colors } from "../theme/colors";
-
-// ── Devices stack (list + detail) ────────────────────────────────
-
-const DevicesStack = createNativeStackNavigator({
-  screens: {
-    DevicesList: {
-      screen: DevicesScreen,
-      options: { headerShown: false },
-    },
-    DeviceDetail: {
-      screen: DeviceDetailScreen,
-      options: {
-        title: "Device",
-        headerTransparent: true,
-        headerBlurEffect: "systemMaterial",
-      },
-    },
-  },
-});
 
 // ── Main tabs (native platform tabs) ─────────────────────────────
 
-const MainTabs = createNativeBottomTabNavigator({
+const HomeNavigator = createNativeBottomTabNavigator({
+  screenOptions: {
+    lazy: false,
+    headerBackButtonDisplayMode: 'minimal',
+  },
   sidebarAdaptable: false,
   scrollEdgeAppearance: "opaque",
   translucent: true,
-  tabBarActiveTintColor: colors.amber[4],
+  headerTransparent: true,
+  tabBarActiveTintColor: "#6366F1",
   tabBarInactiveTintColor: colors.gray[300],
   // tabLabelStyle: {
   //   fontSize: 10,
@@ -55,7 +41,7 @@ const MainTabs = createNativeBottomTabNavigator({
       },
     },
     Firmware: {
-      screen: FirmwareScreen,
+      screen: FirmwareStack,
       options: {
         tabBarIcon: ({ focused }) => ({
           sfSymbol: focused ? "shippingbox.fill" : "shippingbox",
@@ -63,10 +49,18 @@ const MainTabs = createNativeBottomTabNavigator({
       },
     },
     Deployments: {
-      screen: DeploymentsScreen,
+      screen: DeploymentsStack,
       options: {
         tabBarIcon: ({ focused }) => ({
           sfSymbol: focused ? "paperplane.fill" : "paperplane",
+        }),
+      },
+    },
+    Scripts: {
+      screen: ScriptsScreen,
+      options: {
+        tabBarIcon: ({ focused }) => ({
+          sfSymbol: focused ? "applescript.fill" : "applescript",
         }),
       },
     },
@@ -76,6 +70,7 @@ const MainTabs = createNativeBottomTabNavigator({
         tabBarIcon: ({ focused }) => ({
           sfSymbol: focused ? "gearshape.fill" : "gearshape",
         }),
+        role: "search"
       },
     },
   },
@@ -83,18 +78,18 @@ const MainTabs = createNativeBottomTabNavigator({
 
 // ── Home navigator ───────────────────────────────────────────────
 
-const HomeNavigator = createNativeStackNavigator({
-  screenOptions: { headerShown: false },
-  screens: {
-    OrgProduct: {
-      if: useNeedsOrgProduct,
-      screen: OrgProductSelector,
-    },
-    Main: {
-      if: useHasOrgProduct,
-      screen: MainTabs,
-    },
-  },
-});
+// const HomeNavigator = createNativeStackNavigator({
+//   screenOptions: { headerShown: false },
+//   screens: {
+//     OrgProduct: {
+//       if: useNeedsOrgProduct,
+//       screen: OrgProductSelector,
+//     },
+//     Main: {
+//       if: useHasOrgProduct,
+//       screen: MainTabs,
+//     },
+//   },
+// });
 
 export default HomeNavigator;

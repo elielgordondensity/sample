@@ -3,7 +3,7 @@ import { defineConfig } from "orval";
 export default defineConfig({
   nerveshub: {
     input: {
-      target: "./openapi/nerveshub.yaml",
+      target: "./openapi/nerveshub.json",
     },
     output: {
       mode: "tags-split",

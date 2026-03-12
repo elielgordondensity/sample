@@ -5,10 +5,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useTheme } from "../context/ThemeContext";
+import { useTheme } from "../theme/ThemeProvider";
 import { Typography } from "./typography";
 import { radius, spacing } from "./tokens";
-import { colors } from "../theme/colors";
 
 // ── Loading ──────────────────────────────────────────────────────
 
@@ -83,7 +82,7 @@ export function EmptyView({
 }) {
   const { colors } = useTheme();
   return (
-    <View style={[styles.center, { backgroundColor: colors.background }]}>
+    <View style={[styles.center, { paddingVertical: 24, backgroundColor: colors.background }]}>
       <Typography type="subheader" fontSize={20} fontWeight="600">
         {title}
       </Typography>
@@ -155,22 +154,7 @@ export function UpdateStatusChip({ status }: { status: string | undefined }) {
 
 // ── Card ─────────────────────────────────────────────────────────
 
-export function Card({ children }: { children: React.ReactNode }) {
-  const { colors: themeColors } = useTheme();
-  return (
-    <View
-      style={[
-        styles.card,
-        {
-          backgroundColor: themeColors.surface,
-          borderColor: themeColors.border,
-        },
-      ]}
-    >
-      {children}
-    </View>
-  );
-}
+export { Card } from "./card";
 
 // ── Styles ───────────────────────────────────────────────────────
 
@@ -206,30 +190,5 @@ const styles = StyleSheet.create({
     borderRadius: radius.sm,
     paddingHorizontal: spacing.sm,
     paddingVertical: 1,
-  },
-  card: {
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: radius.md,
-    padding: spacing.lg,
-    marginHorizontal: spacing.lg,
-    marginVertical: spacing.sm,
-    borderCurve: "continuous",
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
-    boxShadow: [
-      {
-        color: `${colors.gray["600"]}08`,
-        offsetX: 1,
-        offsetY: 4,
-        blurRadius: 8,
-        spreadDistance: 2,
-      },
-      {
-        color: `${colors.gray["600"]}10`,
-        offsetX: 0,
-        offsetY: 0,
-        blurRadius: 1,
-        spreadDistance: 0,
-      },
-    ],
   },
 });

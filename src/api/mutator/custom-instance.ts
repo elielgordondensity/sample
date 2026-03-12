@@ -9,7 +9,7 @@ let AXIOS_INSTANCE = Axios.create();
  */
 export const configureAxios = (instanceUrl: string, token: string) => {
   AXIOS_INSTANCE = Axios.create({
-    baseURL: `${instanceUrl}/api`,
+    baseURL: instanceUrl,
     headers: {
       Authorization: `token ${token}`,
     },

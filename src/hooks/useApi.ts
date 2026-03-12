@@ -10,6 +10,7 @@ import {
 import { useListFirmwares } from "../api/generated/firmwares/firmwares";
 import { useListDeploymentGroups } from "../api/generated/deployment-groups/deployment-groups";
 import { useListSigningKeys } from "../api/generated/signing-keys/signing-keys";
+import { useListScripts } from "../api/generated/scripts/scripts";
 import { useAuth } from "../context/AuthContext";
 import { useOrgProduct } from "../context/OrgProductContext";
 
@@ -133,6 +134,19 @@ export function useKeys() {
   return useListSigningKeys(orgId ?? "", {
     query: {
       enabled: !!token && !!orgId,
+      staleTime: 30_000,
+    },
+  });
+}
+
+// ── Scripts ─────────────────────────────────────────────────────
+
+export function useScripts() {
+  const { token } = useAuth();
+  const { orgId: org, productId: product } = useOrgProduct();
+  return useListScripts(org ?? "", product ?? "", {
+    query: {
+      enabled: !!token && !!org && !!product,
       staleTime: 30_000,
     },
   });

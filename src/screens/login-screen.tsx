@@ -4,13 +4,14 @@ import {
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
-  TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
-import { radius, spacing } from "../components/tokens";
-import { useTheme } from "../context/ThemeContext";
+import { spacing } from "../components/tokens";
+import { useTheme } from "../theme/ThemeProvider";
 import { Typography } from "../components/typography";
+import { TextInput } from "../components/text-input";
+import { Button } from "../components/button";
+import { NervesHubLogo } from "../components/NervesHubLogo";
 import { LoadingView } from "../components/ui";
 import { useAuth } from "../context/AuthContext";
 
@@ -48,38 +49,28 @@ export default function LoginScreen() {
 
   if (loading) return <LoadingView message="Validating credentials…" />;
 
-  const inputStyle = [
-    styles.input,
-    {
-      backgroundColor: colors.surface,
-      borderColor: colors.border,
-      color: colors.textPrimary,
-    },
-  ];
-
   return (
     <KeyboardAvoidingView
       style={[styles.container, { backgroundColor: colors.background }]}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <View style={styles.content}>
-        <Typography type="header" fontSize={32} textAlign="center" color={colors.accent}>
-          NervesHub
-        </Typography>
+        <View style={styles.logoContainer}>
+          <NervesHubLogo size={48} />
+        </View>
         <Typography type="body" fontSize={12} textAlign="center" marginTop={spacing.sm} marginBottom={spacing.xxl} color={colors.textSecondary}>
           Sign in to your instance
         </Typography>
 
+        <View style={styles.fields}>
         <View style={styles.field}>
           <Typography type="body" fontSize={12} marginBottom={spacing.xs} color={colors.textSecondary}>
             Instance URL
           </Typography>
           <TextInput
-            style={inputStyle}
             value={instanceUrl}
             onChangeText={setInstanceUrl}
             placeholder="https://manage.nervescloud.com"
-            placeholderTextColor={colors.textPlaceholder}
             autoCapitalize="none"
             autoCorrect={false}
             keyboardType="url"
@@ -91,11 +82,9 @@ export default function LoginScreen() {
             Email
           </Typography>
           <TextInput
-            style={inputStyle}
             value={email}
             onChangeText={setEmail}
             placeholder="user@example.com"
-            placeholderTextColor={colors.textPlaceholder}
             autoCapitalize="none"
             autoCorrect={false}
             keyboardType="email-address"
@@ -107,25 +96,23 @@ export default function LoginScreen() {
             Password
           </Typography>
           <TextInput
-            style={inputStyle}
             value={password}
             onChangeText={setPassword}
             placeholder="Enter your password"
-            placeholderTextColor={colors.textPlaceholder}
             autoCapitalize="none"
             autoCorrect={false}
             secureTextEntry
           />
         </View>
+        </View>
 
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: colors.accent }]}
+        <Button
+          label="Sign In"
           onPress={handleLogin}
-        >
-          <Typography type="subheader" fontSize={20} fontWeight="600" color={colors.white}>
-            Sign In
-          </Typography>
-        </TouchableOpacity>
+          fullWidth
+          size="xl"
+          style={{ marginTop: spacing.lg }}
+        />
       </View>
     </KeyboardAvoidingView>
   );
@@ -135,6 +122,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  logoContainer: {
+    alignItems: "center",
+    marginBottom: spacing.xs,
+  },
   content: {
     flex: 1,
     justifyContent: "center",
@@ -143,16 +134,7 @@ const styles = StyleSheet.create({
   field: {
     marginBottom: spacing.lg,
   },
-  input: {
-    borderWidth: 1,
-    borderRadius: radius.md,
-    padding: spacing.md,
-    fontSize: 16,
-  },
-  button: {
-    borderRadius: radius.md,
-    paddingVertical: spacing.md,
-    alignItems: "center",
-    marginTop: spacing.lg,
-  },
+  fields: {
+    marginBottom: 24
+  }
 });

@@ -57,7 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         configureAxios(instanceUrl, token);
         try {
           const res = await customInstance<UserResponse>({
-            url: "/users/me",
+            url: "/api/users/me",
             method: "GET",
           });
           user = res?.data ?? null;
@@ -100,8 +100,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         instanceUrl,
         token: authToken,
         user: {
-          name: responseData.name,
-          email: responseData.email,
+          name: responseData.name ?? "",
+          email: responseData.email ?? "",
         },
       }));
     },

@@ -29,7 +29,8 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "react-native-bottom-tabs"
+      "react-native-bottom-tabs",
+      "expo-font"
     ]
   }
 }

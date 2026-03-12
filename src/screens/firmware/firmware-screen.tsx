@@ -1,15 +1,17 @@
-import React from "react";
-import { FlatList, StyleSheet, View } from "react-native";
+import React, { useCallback } from "react";
+import { FlatList, RefreshControl, StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { spacing } from "../components/tokens";
-import { useTheme } from "../context/ThemeContext";
-import { Typography } from "../components/typography";
-import { EmptyView, ErrorView, LoadingView } from "../components/ui";
-import { useFirmware } from "../hooks/useApi";
-import type { Firmware } from "../api/generated/schemas";
+import { useNavigation } from "@react-navigation/native";
+import { spacing } from "../../components/tokens";
+import { useTheme } from "../../theme/ThemeProvider";
+import { Typography } from "../../components/typography";
+import { Card, EmptyView, ErrorView, LoadingView } from "../../components/ui";
+import { useFirmware } from "../../hooks/useApi";
+import type { Firmware } from "../../api/generated/schemas";
 
 export default function FirmwareScreen() {
   const { colors } = useTheme();
+  const navigation = useNavigation<any>();
   const firmwareQuery = useFirmware();
 
   if (firmwareQuery.isLoading)
@@ -29,10 +31,17 @@ export default function FirmwareScreen() {
   });
 
   const renderFirmware = ({ item }: { item: Firmware }) => (
-    <View style={[styles.row, { borderBottomColor: colors.border }]}>
+    <Card
+      onPress={() => navigation.navigate("FirmwareDetail", { firmware: item })}
+    >
       <View style={styles.headerRow}>
-        <Typography type="subheader" fontSize={20} fontWeight="600" lineHeight={28}>
-          v{item.version ?? "?"}
+        <Typography
+          fontSize={16}
+          fontWeight="600"
+          lineHeight={28}
+          color={colors.textPrimary}
+        >
+          {item.version ?? "?"}
         </Typography>
         <View style={styles.badges}>
           {item.signed && (
@@ -51,7 +60,12 @@ export default function FirmwareScreen() {
       </View>
 
       {item.description ? (
-        <Typography type="body" fontSize={12} marginTop={spacing.xs} color={colors.textSecondary}>
+        <Typography
+          type="body"
+          fontSize={12}
+          marginTop={spacing.xs}
+          color={colors.textSecondary}
+        >
           {item.description}
         </Typography>
       ) : null}
@@ -65,31 +79,53 @@ export default function FirmwareScreen() {
       </View>
 
       {item.uuid && (
-        <Typography type="caption" fontType="mono" fontSize={10} marginTop={spacing.sm} color={colors.textTertiary}>
+        <Typography
+          type="caption"
+          fontType="mono"
+          fontSize={10}
+          marginTop={spacing.sm}
+          color={colors.textTertiary}
+        >
           {item.uuid}
         </Typography>
       )}
 
       {item.inserted_at && (
-        <Typography type="caption" fontSize={11} marginTop={spacing.xs} color={colors.textTertiary}>
+        <Typography
+          type="caption"
+          fontSize={11}
+          marginTop={spacing.xs}
+          color={colors.textTertiary}
+        >
           {new Date(item.inserted_at).toLocaleDateString()}
         </Typography>
       )}
-    </View>
+    </Card>
   );
 
   function renderListHeader() {
     return (
-      <Typography type="header" fontSize={26} fontWeight="600" lineHeight={28} marginBottom={4} paddingHorizontal={spacing.lg} paddingTop={spacing.lg} paddingBottom={spacing.md}>
-        Firmware
-      </Typography>
+      <View style={styles.listHeader}>
+        <Typography
+          type="header"
+          fontSize={26}
+          fontWeight="600"
+        >
+          Firmware
+        </Typography>
+        <Typography
+          type="body"
+          fontSize={13}
+          color={colors.textTertiary}
+        >
+          Uploaded firmware images for this product
+        </Typography>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: colors.background }]}
-    >
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <FlatList
         data={firmwares}
         keyExtractor={(item) => item.uuid ?? String(Math.random())}
@@ -102,8 +138,16 @@ export default function FirmwareScreen() {
           />
         }
         contentContainerStyle={styles.list}
+        ItemSeparatorComponent={() => <View style={{ height: 3 }} />}
+        refreshControl={
+          <RefreshControl
+            refreshing={firmwareQuery.isRefetching}
+            onRefresh={() => firmwareQuery.refetch()}
+            tintColor={colors.textTertiary}
+          />
+        }
       />
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -114,7 +158,13 @@ function MetaItem({ label, value }: { label: string; value: string }) {
       <Typography type="caption" fontSize={11} color={colors.textTertiary}>
         {label}
       </Typography>
-      <Typography type="body" fontType="mono" fontSize={12} color={colors.textSecondary}>
+      <Typography
+        type="body"
+        fontType="mono"
+        fontWeight="500"
+        fontSize={12}
+        color={colors.textSecondary}
+      >
         {value}
       </Typography>
     </View>
@@ -126,12 +176,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   list: {
-    paddingBottom: spacing.xl,
+    paddingTop: 120,
+    paddingBottom: 120,
   },
-  row: {
-    marginHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+  listHeader: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xl,
+    gap: spacing.xs,
   },
   headerRow: {
     flexDirection: "row",

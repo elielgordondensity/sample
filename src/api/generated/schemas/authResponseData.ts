@@ -8,4 +8,6 @@
 
 export type AuthResponseData = {
   token?: string;
+  name?: string;
+  email?: string;
 };

@@ -4,6 +4,7 @@ import { SvgProps } from "react-native-svg";
 
 import { Typography } from "../typography";
 import { colors } from "../../theme/colors";
+import { useTheme } from "../../theme/ThemeProvider";
 
 export type TagColorScheme =
   | "gray"
@@ -39,7 +40,55 @@ interface ColorMap {
   fontColor: string;
 }
 
-export function getTagColorScheme(color: TagColorScheme): ColorMap {
+export function getTagColorScheme(
+  color: TagColorScheme,
+  isDark: boolean,
+): ColorMap {
+  if (isDark) {
+    switch (color) {
+      case "white":
+        return {
+          backgroundColor: "#1C2128",
+          borderColor: "#30363D",
+          fontColor: "#C9D1D9",
+        };
+      case "gray":
+        return {
+          backgroundColor: colors.gray["800"],
+          borderColor: colors.gray["700"],
+          fontColor: "#C9D1D9",
+        };
+      case "blue":
+        return {
+          backgroundColor: colors.blue["800"],
+          borderColor: colors.blue["600"] + "4D",
+          fontColor: colors.blue["200"],
+        };
+      case "orange":
+        return {
+          backgroundColor: colors.orange["800"],
+          borderColor: colors.orange["500"] + "4D",
+          fontColor: colors.orange["200"],
+        };
+      case "green":
+        return {
+          backgroundColor: colors.green["800"],
+          borderColor: colors.green["600"] + "4D",
+          fontColor: colors.green["200"],
+        };
+      case "red":
+        return {
+          backgroundColor: colors.red["800"],
+          borderColor: colors.red["600"] + "4D",
+          fontColor: colors.red["200"],
+        };
+      default: {
+        const _exhaustiveCheck: never = color;
+        throw new Error(`Unhandled color scheme: ${_exhaustiveCheck}`);
+      }
+    }
+  }
+
   switch (color) {
     case "white":
       return {
@@ -78,7 +127,6 @@ export function getTagColorScheme(color: TagColorScheme): ColorMap {
         fontColor: "#4D0000",
       };
     default: {
-      // This ensures type safety by checking that we've handled all cases
       const _exhaustiveCheck: never = color;
       throw new Error(`Unhandled color scheme: ${_exhaustiveCheck}`);
     }
@@ -118,8 +166,9 @@ export function Tag({
   adjustIconPadding = false,
   uppercase = false,
 }: TagProps) {
+  const { isDark } = useTheme();
   const { backgroundColor, fontColor, borderColor } =
-    getTagColorScheme(colorScheme);
+    getTagColorScheme(colorScheme, isDark);
   const { vertical, horizontal } = getTagSizePadding(size);
 
   return (
@@ -148,6 +197,7 @@ export function Tag({
         letterSpacing={0.15}
         textTransform={uppercase ? "uppercase" : "none"}
         color={fontColor}
+        lineHeight={0}
       >
         {label}
       </Typography>

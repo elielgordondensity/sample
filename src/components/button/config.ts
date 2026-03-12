@@ -11,49 +11,46 @@ export const BUTTON_SIZES = {
   xl: { height: 60, borderRadius: 30, fontSize: 15, paddingHorizontal: 24 },
 } as const;
 
-export const BUTTON_VARIANTS = {
-  primary: {
-    backgroundColor: colors.midnight[2],
-    textColor: colors.blue['000'],
-    borderColor: '#102C4C00',
-    borderWidth: 0,
-  },
-  secondary: {
-    backgroundColor: colors.amber[3],
-    textColor: colors.midnight[2],
-    borderColor: colors.amber[1],
-    borderWidth: StyleSheet.hairlineWidth,
-  },
-  tertiary: {
-    backgroundColor: 'rgba(255, 255, 255, 0.6)',
-    textColor: '#121B03F5',
-    borderColor: 'white',
-    borderWidth: 1,
-    boxShadow: {
-      offsetX: 0,
-      offsetY: 0,
-      blurRadius: 1,
-      spreadDistance: 10,
-      inset: true,
-      color: 'rgba(255, 255, 255, 0.1)',
+export function getButtonVariants(isDark: boolean) {
+  return {
+    primary: {
+      backgroundColor: isDark ? colors.blue['600'] : colors.midnight[2],
+      textColor: isDark ? '#F0F3F6' : colors.blue['000'],
+      borderColor: '#102C4C00',
+      borderWidth: 0,
     },
-  },
-  link: {
-    backgroundColor: 'transparent',
-    textColor: '#121B03F5',
-    borderColor: 'transparent',
-    borderWidth: 0,
-  },
-  destructive: {
-    backgroundColor: colors.red[400],
-    textColor: colors.red[700],
-    borderColor: colors.red[200],
-    borderWidth: StyleSheet.hairlineWidth,
-  },
-  icon: {
-    backgroundColor: 'transparent',
-    textColor: '#121B03F5',
-    borderColor: 'white',
-    borderWidth: 1,
-  },
-} as const;
+    secondary: {
+      backgroundColor: isDark ? colors.amber[4] : colors.amber[3],
+      textColor: isDark ? '#F0F3F6' : colors.midnight[2],
+      borderColor: isDark ? colors.amber[4] : colors.amber[1],
+      borderWidth: StyleSheet.hairlineWidth,
+    },
+    tertiary: {
+      backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.6)',
+      textColor: isDark ? '#C9D1D9' : '#121B03F5',
+      borderColor: isDark ? '#30363D' : 'white',
+      borderWidth: 1,
+    },
+    link: {
+      backgroundColor: 'transparent',
+      textColor: isDark ? '#C9D1D9' : '#121B03F5',
+      borderColor: 'transparent',
+      borderWidth: 0,
+    },
+    destructive: {
+      backgroundColor: isDark ? colors.red[800] : colors.red[400],
+      textColor: isDark ? colors.red[200] : colors.red[700],
+      borderColor: isDark ? colors.red[600] : colors.red[200],
+      borderWidth: StyleSheet.hairlineWidth,
+    },
+    icon: {
+      backgroundColor: 'transparent',
+      textColor: isDark ? '#C9D1D9' : '#121B03F5',
+      borderColor: isDark ? '#30363D' : 'white',
+      borderWidth: 1,
+    },
+  } as const;
+}
+
+// Keep backward compat — light variants as default export
+export const BUTTON_VARIANTS = getButtonVariants(false);

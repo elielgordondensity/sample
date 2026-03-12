@@ -97,9 +97,9 @@ export function Divider({
   );
 }
 
-const createStyles = (_theme: ColorTheme) =>
+const createStyles = (theme: ColorTheme) =>
   StyleSheet.create({
     divider: {
-      backgroundColor: '#E0E0E099',
+      backgroundColor: theme.borderLight,
     },
   });
