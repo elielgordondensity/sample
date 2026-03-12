@@ -199,9 +199,11 @@ export default function DeploymentsScreen() {
             Deployments
           </Typography>
           {deployments.length > 0 && (
+            <View style={{backgroundColor: colors.backgroundTertiary, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8}}>
             <Typography type="body" fontSize={15} color={colors.textTertiary}>
               {deployments.length}
             </Typography>
+            </View>
           )}
         </View>
         <Typography type="body" fontSize={13} color={colors.textTertiary}>
@@ -245,6 +247,7 @@ const styles = StyleSheet.create({
   list: {
     paddingTop: 120,
     paddingBottom: 120,
+    flex: 1
   },
   listHeader: {
     paddingHorizontal: spacing.lg,
@@ -253,7 +256,7 @@ const styles = StyleSheet.create({
   },
   titleRow: {
     flexDirection: "row",
-    alignItems: "baseline",
+    alignItems: "center",
     gap: spacing.sm,
   },
   headerRow: {

@@ -5,7 +5,7 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
-import { useColorScheme } from "react-native";
+import { useColorScheme, Appearance } from "react-native";
 
 import { ColorTheme, COLORS_LIGHT, COLORS_DARK } from "./colors";
 import { borderRadius, BorderRadius } from "./border-radius";
@@ -54,12 +54,14 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   // Get the appropriate color palette
   const currentColors = isDark ? COLORS_DARK : COLORS_LIGHT;
 
-  // Effect to handle system theme changes
+  // Sync native appearance so liquid glass and other native elements match
   useEffect(() => {
     if (theme === "system") {
-      // Force update when system theme changes
+      Appearance.setColorScheme(null);
+    } else {
+      Appearance.setColorScheme(theme);
     }
-  }, [systemColorScheme, theme]);
+  }, [theme]);
 
   const value = {
     theme,

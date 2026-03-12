@@ -106,13 +106,23 @@ export default function FirmwareScreen() {
   function renderListHeader() {
     return (
       <View style={styles.listHeader}>
-        <Typography
-          type="header"
-          fontSize={26}
-          fontWeight="600"
-        >
-          Firmware
-        </Typography>
+        <View style={styles.titleRow}>
+          <Typography
+            type="header"
+            fontSize={26}
+            fontWeight="600"
+            lineHeight={28}
+          >
+            Firmware
+          </Typography>
+          {firmwares.length > 0 && (
+            <View style={{backgroundColor: colors.backgroundTertiary, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8}}>
+              <Typography type="body" fontSize={15} color={colors.textTertiary}>
+                {firmwares.length}
+              </Typography>
+            </View>
+          )}
+        </View>
         <Typography
           type="body"
           fontSize={13}
@@ -183,6 +193,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xl,
     gap: spacing.xs,
+  },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
   },
   headerRow: {
     flexDirection: "row",

@@ -3,10 +3,10 @@ import {
   Alert,
   ScrollView,
   StyleSheet,
-  TouchableOpacity,
   View,
 } from "react-native";
-import { radius, spacing } from "../components/tokens";
+import SegmentedControl from "@react-native-segmented-control/segmented-control";
+import { spacing } from "../components/tokens";
 import { useTheme, type ThemeMode } from "../theme/ThemeProvider";
 import { Typography } from "../components/typography";
 import { Card } from "../components/ui";
@@ -112,32 +112,16 @@ export default function SettingsScreen() {
 
         <View style={styles.section}>
           <SectionLabel title="Appearance" />
-          <Card>
-            <View style={styles.segmentedControl}>
-              {themeModes.map(({ label, value }) => {
-                const isActive = mode === value;
-                return (
-                  <TouchableOpacity
-                    key={value}
-                    style={[
-                      styles.segment,
-                      isActive && { backgroundColor: colors.accent },
-                    ]}
-                    onPress={() => setMode(value)}
-                  >
-                    <Typography
-                      type="body"
-                      fontSize={14}
-                      color={isActive ? colors.white : colors.textSecondary}
-                      fontWeight={isActive ? "600" : "400"}
-                    >
-                      {label}
-                    </Typography>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </Card>
+          <View style={styles.segmentedControlWrapper}>
+            <SegmentedControl
+              values={themeModes.map(({ label }) => label)}
+              selectedIndex={themeModes.findIndex(({ value }) => value === mode)}
+              onChange={(event) => {
+                const index = event.nativeEvent.selectedSegmentIndex;
+                setMode(themeModes[index].value);
+              }}
+            />
+          </View>
         </View>
 
         <View style={styles.logoutWrapper}>
@@ -174,15 +158,8 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     marginTop: spacing.md,
   },
-  segmentedControl: {
-    flexDirection: "row",
-    gap: spacing.sm,
-  },
-  segment: {
-    flex: 1,
-    alignItems: "center",
-    paddingVertical: spacing.sm,
-    borderRadius: radius.sm,
+  segmentedControlWrapper: {
+    paddingHorizontal: spacing.lg,
   },
   logoutWrapper: {
     paddingHorizontal: spacing.lg,
