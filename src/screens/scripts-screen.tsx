@@ -1,9 +1,9 @@
 import React from "react";
 import { FlatList, StyleSheet, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { spacing } from "../components/tokens";
 import { useTheme } from "../theme/ThemeProvider";
 import { Typography } from "../components/typography";
+import { Card } from "../components/card";
 import { EmptyView, ErrorView, LoadingView } from "../components/ui";
 import { useScripts } from "../hooks/useApi";
 import type { Script } from "../api/generated/schemas";
@@ -25,7 +25,7 @@ export default function ScriptsScreen() {
   const scripts = scriptsQuery.data?.data ?? [];
 
   const renderScript = ({ item }: { item: Script }) => (
-    <View style={[styles.row, { borderBottomColor: colors.border }]}>
+    <Card>
       <Typography type="subheader" fontSize={16} fontWeight="600">
         {item.name ?? "Untitled"}
       </Typography>
@@ -53,7 +53,7 @@ export default function ScriptsScreen() {
           {new Date(item.inserted_at).toLocaleDateString()}
         </Typography>
       )}
-    </View>
+    </Card>
   );
 
   function renderListHeader() {
@@ -65,7 +65,6 @@ export default function ScriptsScreen() {
         lineHeight={28}
         marginBottom={4}
         paddingHorizontal={spacing.lg}
-        paddingTop={spacing.lg}
         paddingBottom={spacing.md}
       >
         Scripts
@@ -74,7 +73,7 @@ export default function ScriptsScreen() {
   }
 
   return (
-    <SafeAreaView
+    <View
       style={[styles.container, { backgroundColor: colors.background }]}
     >
       <FlatList
@@ -82,15 +81,19 @@ export default function ScriptsScreen() {
         keyExtractor={(item) => String(item.id ?? item.name ?? Math.random())}
         renderItem={renderScript}
         ListHeaderComponent={renderListHeader}
+        style={{ flex: 1 }}
+        ItemSeparatorComponent={() => <View style={{ height: 3 }} />}
         ListEmptyComponent={
-          <EmptyView
-            title="No Scripts"
-            message="No support scripts have been created for this product."
-          />
+          <View style={styles.emptyContainer}>
+            <EmptyView
+              title="No Scripts"
+              message="No support scripts have been created for this product."
+            />
+          </View>
         }
         contentContainerStyle={styles.list}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -99,11 +102,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   list: {
+    flexGrow: 1,
+    paddingTop: 120,
     paddingBottom: spacing.xl,
   },
-  row: {
-    marginHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

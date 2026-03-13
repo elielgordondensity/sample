@@ -1,5 +1,6 @@
 import React, { memo, useCallback } from "react";
 import { View, StyleSheet } from "react-native";
+import ContextMenu from "react-native-context-menu-view";
 
 import { spacing } from "../../components/tokens";
 import { useTheme } from "../../theme/ThemeProvider";
@@ -15,11 +16,21 @@ import HashIcon from "../../../assets/icons/hashtag.svg";
 import CheckShieldIcon from "../../../assets/icons/check-shield.svg";
 import TargetIcon from "../../../assets/icons/cog.svg";
 
+export type DeviceMenuAction = "reboot" | "reconnect" | "identify" | "tags";
+
 export type DeviceCardProps = {
   device: Device;
   onPress?: (device: Device) => void;
   onEllipsisPress?: (device: Device) => void;
+  onMenuAction?: (device: Device, action: DeviceMenuAction) => void;
 };
+
+const MENU_ACTIONS: { title: string; systemIcon: string; key: DeviceMenuAction }[] = [
+  { title: "Reboot", systemIcon: "arrow.clockwise", key: "reboot" },
+  { title: "Reconnect", systemIcon: "wifi", key: "reconnect" },
+  { title: "Identify", systemIcon: "scope", key: "identify" },
+  { title: "Edit Tags", systemIcon: "tag", key: "tags" },
+];
 
 export const DeviceCard = memo(DeviceCardRaw, (prev, next) => {
   return (
@@ -32,20 +43,24 @@ export const DeviceCard = memo(DeviceCardRaw, (prev, next) => {
     prev.device.deployment_group?.platform ===
       next.device.deployment_group?.platform &&
     prev.onPress === next.onPress &&
-    prev.onEllipsisPress === next.onEllipsisPress
+    prev.onMenuAction === next.onMenuAction
   );
 });
 
-function DeviceCardRaw({ device, onPress, onEllipsisPress }: DeviceCardProps) {
+function DeviceCardRaw({ device, onPress, onMenuAction }: DeviceCardProps) {
   const { colors: themeColors } = useTheme();
 
   const handlePress = useCallback(() => {
     onPress?.(device);
   }, [onPress, device]);
 
-  const handleEllipsis = useCallback(() => {
-    onEllipsisPress?.(device);
-  }, [onEllipsisPress, device]);
+  const handleMenuAction = useCallback(
+    (e: { nativeEvent: { index: number } }) => {
+      const action = MENU_ACTIONS[e.nativeEvent.index];
+      if (action) onMenuAction?.(device, action.key);
+    },
+    [onMenuAction, device],
+  );
 
   const tags = Array.isArray(device.tags)
     ? device.tags
@@ -74,18 +89,24 @@ function DeviceCardRaw({ device, onPress, onEllipsisPress }: DeviceCardProps) {
           </Typography>
         </View>
 
-        <Button
-          type="icon"
-          size="xs"
-          iconLeft={
-            <EllipsisIcon
-              width={18}
-              height={18}
-              color={themeColors.textTertiary}
-            />
-          }
-          onPress={handleEllipsis}
-        />
+        <ContextMenu
+          title={`${device.identifier}`}
+          actions={MENU_ACTIONS.map(({ title, systemIcon }) => ({ title, systemIcon }))}
+          onPress={handleMenuAction}
+          dropdownMenuMode
+        >
+          <Button
+            type="icon"
+            size="xs"
+            iconLeft={
+              <EllipsisIcon
+                width={18}
+                height={18}
+                color={themeColors.textTertiary}
+              />
+            }
+          />
+        </ContextMenu>
       </View>
 
       <View style={styles.details}>

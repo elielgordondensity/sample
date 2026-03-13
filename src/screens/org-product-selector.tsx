@@ -1,5 +1,6 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useLayoutEffect, useMemo, useState } from "react";
 import {
+  Alert,
   SectionList,
   StyleSheet,
   View,
@@ -11,6 +12,7 @@ import { Card } from "../components/card";
 import { useTheme } from "../theme/ThemeProvider";
 import { Typography } from "../components/typography";
 import { SearchInput } from "../components/search-input";
+import { Button } from "../components/button";
 import { EmptyView, ErrorView, LoadingView } from "../components/ui";
 import { useAuth } from "../context/AuthContext";
 import { useOrgProduct } from "../context/OrgProductContext";
@@ -20,9 +22,38 @@ import type { Product } from "../api/generated/schemas";
 
 export default function OrgProductSelector() {
   const { colors } = useTheme();
-  const { token } = useAuth();
+  const { token, logout } = useAuth();
   const navigation = useNavigation();
-  const { selectOrgAndProduct } = useOrgProduct();
+  const { selectOrgAndProduct, resetOrgAndProduct } = useOrgProduct();
+
+  const handleLogout = useCallback(() => {
+    Alert.alert("Log out", "Are you sure you want to log out?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Log out",
+        style: "destructive",
+        onPress: async () => {
+          resetOrgAndProduct();
+          await logout();
+        },
+      },
+    ]);
+  }, [logout, resetOrgAndProduct]);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerShown: true,
+      title: "",
+      headerTransparent: true,
+      headerRight: () => (
+        <Button
+          label="Log out"
+          size="xs"
+          onPress={handleLogout}
+        />
+      ),
+    });
+  }, [navigation, handleLogout]);
   const [search, setSearch] = useState("");
 
   const { data, isLoading, isError, refetch } = useListOrgs(

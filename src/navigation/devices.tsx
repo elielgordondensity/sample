@@ -4,6 +4,7 @@ import DeviceDetailScreen from "../screens/devices/device-detail-screen";
 import PinnedDevicesScreen from "../screens/devices/pinned-devices-screen";
 import DeviceSearchScreen from "../screens/devices/device-search-screen";
 import DeviceConsoleScreen from "../screens/devices/device-console-screen";
+import EditDeviceTagsScreen from "../screens/devices/edit-device-tags-screen";
 
 const DevicesStack = createNativeStackNavigator({
   screenOptions: {
@@ -44,6 +45,23 @@ const DevicesStack = createNativeStackNavigator({
       options: {
         title: "Console",
         headerTransparent: true,
+      },
+    },
+  },
+  groups: {
+    Modal: {
+      screenOptions: {
+        presentation: "pageSheet",
+        sheetGrabberVisible: true,
+        sheetAllowedDetents: [0.5, 1.0],
+      },
+      screens: {
+        EditDeviceTags: {
+          screen: EditDeviceTagsScreen,
+          options: {
+            title: "",
+          },
+        },
       },
     },
   },

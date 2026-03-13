@@ -1,5 +1,6 @@
 import React, {
   createContext,
+  useCallback,
   useContext,
   useState,
   useEffect,
@@ -10,6 +11,7 @@ import { useColorScheme, Appearance } from "react-native";
 import { ColorTheme, COLORS_LIGHT, COLORS_DARK } from "./colors";
 import { borderRadius, BorderRadius } from "./border-radius";
 import { spacing, Spacing } from "./spacing";
+import { getString, setString, STORAGE_KEYS } from "../utils/storage";
 
 export type ThemeMode = "light" | "dark" | "system";
 
@@ -45,7 +47,15 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   defaultTheme = "system",
 }) => {
   const systemColorScheme = useColorScheme();
-  const [theme, setTheme] = useState<ThemeMode>(defaultTheme);
+  const [theme, setThemeState] = useState<ThemeMode>(() => {
+    const stored = getString(STORAGE_KEYS.THEME) as ThemeMode | undefined;
+    return stored && ["light", "dark", "system"].includes(stored) ? stored : defaultTheme;
+  });
+
+  const setTheme = useCallback((next: ThemeMode) => {
+    setString(STORAGE_KEYS.THEME, next);
+    setThemeState(next);
+  }, []);
 
   // Determine if dark mode is active
   const isDark =

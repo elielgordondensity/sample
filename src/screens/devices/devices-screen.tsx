@@ -1,7 +1,9 @@
-import React, { useEffect, useLayoutEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
+  RefreshControl,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -20,10 +22,15 @@ import {
 import { useOrgProduct } from "../../context/OrgProductContext";
 import { useInfiniteDevices } from "../../hooks/useApi";
 import { useDeviceChannel } from "../../hooks/useDeviceChannel";
+import {
+  useRebootDevice,
+  useReconnectDevice,
+} from "../../api/generated/devices/devices";
+import { customInstance } from "../../api/mutator/custom-instance";
 import type { Device } from "../../api/generated/schemas";
 import { Button } from "../../components/button";
 import { SearchInput } from "../../components/search-input";
-import { DeviceCard } from "./device-card";
+import { DeviceCard, type DeviceMenuAction } from "./device-card";
 
 import SwitchIcon from "../../../assets/icons/products.svg";
 import StarOutlineIcon from "../../../assets/icons/star-outline.svg";
@@ -141,6 +148,68 @@ export default function DevicesScreen() {
     });
   }, [navigation, HeaderLeft, HeaderRight]);
 
+  const reboot = useRebootDevice();
+  const reconnect = useReconnectDevice();
+
+  const handleMenuAction = useCallback(
+    (device: Device, action: DeviceMenuAction) => {
+      const identifier = String(device.identifier!);
+      const confirm = (label: string, onConfirm: () => void) =>
+        Alert.alert(label, `Are you sure you want to ${label.toLowerCase()} this device?`, [
+          { text: "Cancel", style: "cancel" },
+          { text: label, style: "destructive", onPress: onConfirm },
+        ]);
+
+      switch (action) {
+        case "reboot":
+          confirm(`Reboot ${identifier}`, () =>
+            reboot.mutate(
+              { orgName: orgId!, productName: productId!, identifier },
+              {
+                onSuccess: () => Alert.alert("Success", "Reboot command sent."),
+                onError: () => Alert.alert("Error", "Failed to reboot device."),
+              },
+            ),
+          );
+          break;
+        case "reconnect":
+          confirm(`Reconnect ${identifier}`, () =>
+            reconnect.mutate(
+              { orgName: orgId!, productName: productId!, identifier },
+              {
+                onSuccess: () => Alert.alert("Success", "Reconnect command sent."),
+                onError: () => Alert.alert("Error", "Failed to reconnect device."),
+              },
+            ),
+          );
+          break;
+        case "identify":
+          confirm(`Identify ${identifier}`, () =>
+            customInstance({
+              url: `/api/orgs/${orgId}/products/${productId}/devices/${identifier}/identify`,
+              method: "POST",
+            })
+              .then(() => Alert.alert("Success", "Identify command sent."))
+              .catch(() => Alert.alert("Error", "Failed to identify device.")),
+          );
+          break;
+        case "tags": {
+          const tagList = Array.isArray(device.tags)
+            ? device.tags
+            : typeof device.tags === "string"
+              ? device.tags.split(",").map((t) => t.trim()).filter(Boolean)
+              : [];
+          navigation.navigate("EditDeviceTags", {
+            identifier,
+            currentTags: tagList,
+          });
+          break;
+        }
+      }
+    },
+    [orgId, productId, reboot, reconnect, navigation],
+  );
+
   if (devicesQuery.isLoading) return <LoadingView message="Loading devices…" />;
   if (devicesQuery.isError)
     return (
@@ -161,6 +230,7 @@ export default function DevicesScreen() {
           identifier: String(device.identifier!),
         })
       }
+      onMenuAction={handleMenuAction}
     />
   );
 
@@ -196,6 +266,14 @@ export default function DevicesScreen() {
         renderItem={renderDevice}
         contentContainerStyle={styles.list}
         ListHeaderComponent={renderListHeader}
+        refreshControl={
+          <RefreshControl
+            refreshing={devicesQuery.isRefetching && !devicesQuery.isFetchingNextPage}
+            onRefresh={() => devicesQuery.refetch()}
+            progressViewOffset={120}
+            tintColor={colors.textTertiary}
+          />
+        }
         ListEmptyComponent={
           <EmptyView
             title="No Devices"

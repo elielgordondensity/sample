@@ -44,7 +44,7 @@ export const listScripts = (
       
       
       return customInstance<ScriptListResponse>(
-      {url: `/orgs/${orgName}/products/${productName}/scripts`, method: 'GET', signal
+      {url: `/api/orgs/${orgName}/products/${productName}/scripts`, method: 'GET', signal
     },
       );
     }
@@ -55,7 +55,7 @@ export const listScripts = (
 export const getListScriptsQueryKey = (orgName: string,
     productName: string,) => {
     return [
-    `/orgs/${orgName}/products/${productName}/scripts`
+    `/api/orgs/${orgName}/products/${productName}/scripts`
     ] as const;
     }
 
@@ -143,7 +143,7 @@ export const executeScript = (
       
       
       return customInstance<void>(
-      {url: `/orgs/${orgName}/products/${productName}/devices/${identifier}/scripts/${nameOrId}`, method: 'POST', signal
+      {url: `/api/orgs/${orgName}/products/${productName}/devices/${identifier}/scripts/${nameOrId}`, method: 'POST', signal
     },
       );
     }
@@ -205,7 +205,7 @@ export const executeScriptShort = (
       
       
       return customInstance<void>(
-      {url: `/devices/${identifier}/scripts/${nameOrId}`, method: 'POST', signal
+      {url: `/api/devices/${identifier}/scripts/${nameOrId}`, method: 'POST', signal
     },
       );
     }

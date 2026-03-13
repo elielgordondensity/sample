@@ -236,6 +236,7 @@ export default function DeploymentsScreen() {
             refreshing={deploymentsQuery.isRefetching}
             onRefresh={() => deploymentsQuery.refetch()}
             tintColor={colors.textTertiary}
+            progressViewOffset={120}
           />
         }
       />

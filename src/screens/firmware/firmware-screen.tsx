@@ -154,6 +154,7 @@ export default function FirmwareScreen() {
           <RefreshControl
             refreshing={firmwareQuery.isRefetching}
             onRefresh={() => firmwareQuery.refetch()}
+            progressViewOffset={120}
             tintColor={colors.textTertiary}
           />
         }

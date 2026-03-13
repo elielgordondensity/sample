@@ -1560,6 +1560,8 @@ PODS:
     - ReactNativeDependencies
     - SwiftUIIntrospect (~> 1.0)
     - Yoga
+  - react-native-context-menu-view (1.21.0):
+    - React
   - react-native-mmkv (3.3.3):
     - hermes-engine
     - RCTRequired
@@ -2378,6 +2380,7 @@ DEPENDENCIES:
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
   - "react-native-blur (from `../node_modules/@react-native-community/blur`)"
   - react-native-bottom-tabs (from `../node_modules/react-native-bottom-tabs`)
+  - react-native-context-menu-view (from `../node_modules/react-native-context-menu-view`)
   - react-native-mmkv (from `../node_modules/react-native-mmkv`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - "react-native-segmented-control (from `../node_modules/@react-native-segmented-control/segmented-control`)"
@@ -2535,6 +2538,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-community/blur"
   react-native-bottom-tabs:
     :path: "../node_modules/react-native-bottom-tabs"
+  react-native-context-menu-view:
+    :path: "../node_modules/react-native-context-menu-view"
   react-native-mmkv:
     :path: "../node_modules/react-native-mmkv"
   react-native-safe-area-context:
@@ -2678,6 +2683,7 @@ SPEC CHECKSUMS:
   React-microtasksnativemodule: bef4a47c7efd42421de52201e6d76a73cf6c816e
   react-native-blur: 1b00ef07fe0efdc0c40b37139a5268ccad73c72d
   react-native-bottom-tabs: bcb70e4fae95fc9da0da875f7414acda26dfc551
+  react-native-context-menu-view: da39a4612c1294d651907162529cfba8421e9b89
   react-native-mmkv: 3d69c8bbdbceb1c0d3754863ecffa6ec24e4be12
   react-native-safe-area-context: ae7587b95fb580d1800c5b0b2a7bd48c2868e67a
   react-native-segmented-control: bf6e0032726727498e18dd437ae88afcdbc18e99
