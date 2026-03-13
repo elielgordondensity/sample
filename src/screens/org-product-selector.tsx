@@ -2,12 +2,12 @@ import React, { useMemo, useState } from "react";
 import {
   SectionList,
   StyleSheet,
-  TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { radius, spacing } from "../components/tokens";
+import { spacing } from "../components/tokens";
+import { Card } from "../components/card";
 import { useTheme } from "../theme/ThemeProvider";
 import { Typography } from "../components/typography";
 import { SearchInput } from "../components/search-input";
@@ -65,10 +65,11 @@ export default function OrgProductSelector() {
           keyExtractor={(item, index) => `${item.name}-${index}`}
           contentContainerStyle={styles.list}
           stickySectionHeadersEnabled={false}
+          ItemSeparatorComponent={() => <View style={{ height: 3 }} />}
           ListHeaderComponent={
             orgs.length > 1 ? (
               <View style={styles.inputContainer}>
-                <SearchInput placeholder="Filter organizations" autoCapitalize="none" onChangeText={setSearch} />
+                <SearchInput placeholder="Filter organizations"  autoCapitalize="none" onChangeText={setSearch} />
               </View>
             ) : null
           }
@@ -95,26 +96,21 @@ export default function OrgProductSelector() {
             </Typography>
           )}
           renderItem={({ item: product, section }) => (
-            <TouchableOpacity
-              style={[
-                styles.card,
-                {
-                  backgroundColor: colors.surface,
-                  borderColor: colors.border,
-                },
-              ]}
+            <Card
               onPress={() => {
                 selectOrgAndProduct(section.orgName, product.name ?? "");
                 navigation.goBack();
               }}
             >
-              <Typography type="subheader" fontSize={20} fontWeight="600" lineHeight={28}>
-                {product.name}
-              </Typography>
-              <Typography type="header" fontSize={26} color={colors.textTertiary}>
-                ›
-              </Typography>
-            </TouchableOpacity>
+              <View style={styles.cardContent}>
+                <Typography type="subheader" fontSize={18} fontWeight="600" lineHeight={28}>
+                  {product.name}
+                </Typography>
+                <Typography type="header" fontSize={26} color={colors.textTertiary}>
+                  ›
+                </Typography>
+              </View>
+            </Card>
           )}
           renderSectionFooter={({ section }) =>
             section.data.length === 0 ? (
@@ -154,14 +150,9 @@ const styles = StyleSheet.create({
   list: {
     paddingBottom: spacing.xl,
   },
-  card: {
+  cardContent: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    borderWidth: 1,
-    borderRadius: radius.md,
-    padding: spacing.lg,
-    marginHorizontal: spacing.lg,
-    marginVertical: spacing.xs,
   },
 });

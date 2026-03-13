@@ -5,21 +5,26 @@
  * OpenAPI spec version: 2.0.0
  */
 import {
+  useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
   DefinedUseQueryResult,
+  MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult
 } from '@tanstack/react-query';
 
 import type {
+  ConsoleTokenResponse,
   UserResponse
 } from '../schemas';
 
@@ -118,3 +123,65 @@ export function useGetMe<TData = Awaited<ReturnType<typeof getMe>>, TError = unk
 
 
 
+/**
+ * @summary Generate a token for connecting to the device console websocket
+ */
+export const createConsoleToken = (
+    
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<ConsoleTokenResponse>(
+      {url: `/api/users/console_token`, method: 'POST', signal
+    },
+      );
+    }
+  
+
+
+export const getCreateConsoleTokenMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createConsoleToken>>, TError,void, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof createConsoleToken>>, TError,void, TContext> => {
+
+const mutationKey = ['createConsoleToken'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createConsoleToken>>, void> = () => {
+          
+
+          return  createConsoleToken()
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateConsoleTokenMutationResult = NonNullable<Awaited<ReturnType<typeof createConsoleToken>>>
+    
+    export type CreateConsoleTokenMutationError = unknown
+
+    /**
+ * @summary Generate a token for connecting to the device console websocket
+ */
+export const useCreateConsoleToken = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createConsoleToken>>, TError,void, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createConsoleToken>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getCreateConsoleTokenMutationOptions(options), queryClient);
+    }
+    

@@ -13,6 +13,7 @@ export interface Device {
   deployment_group?: DeviceDeploymentGroup;
   description?: string;
   firmware_metadata?: DeviceFirmwareMetadata;
+  id?: number;
   identifier?: string;
   /** @deprecated */
   last_communication?: string;

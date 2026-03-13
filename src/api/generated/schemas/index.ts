@@ -15,6 +15,8 @@ export * from './cACertificateCreationRequestCaCertificateJitp';
 export * from './cACertificateJitp';
 export * from './cACertificateListResponse';
 export * from './cACertificateResponse';
+export * from './consoleTokenResponse';
+export * from './consoleTokenResponseData';
 export * from './createDeviceCertificateBody';
 export * from './createFirmwareBody';
 export * from './deploymentGroup';

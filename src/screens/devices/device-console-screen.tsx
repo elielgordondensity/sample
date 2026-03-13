@@ -1,23 +1,25 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
-  Alert,
   FlatList,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { StaticScreenProps } from "@react-navigation/native";
 
-import { spacing } from "../../components/tokens";
-import { useTheme } from "../../theme/ThemeProvider";
 import { Typography } from "../../components/typography";
 import { Button } from "../../components/button";
 import { TextInput } from "../../components/text-input";
-import { useExecuteDeviceCode } from "../../api/generated/devices/devices";
-import { useOrgProduct } from "../../context/OrgProductContext";
+import { useConsoleChannel } from "../../hooks/useConsoleChannel";
+import { useThemedStyles } from "../../theme/useThemedStyles";
+import type { ColorTheme } from "../../theme/colors";
+import type { Spacing } from "../../theme/spacing";
+import SendIcon from "../../../assets/icons/send.svg";
 
-type Props = StaticScreenProps<{ identifier: string }>;
+type Props = StaticScreenProps<{ id: number }>;
 
 interface ConsoleEntry {
   id: string;
@@ -25,58 +27,81 @@ interface ConsoleEntry {
   text: string;
 }
 
+const createStyles = (colors: ColorTheme, spacing: Spacing) => ({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  listContainer: {
+    flex: 1,
+  },
+  list: {
+    paddingTop: 120,
+    paddingHorizontal: spacing[18],
+    paddingBottom: 120,
+  },
+  statusBar: {
+    paddingHorizontal: spacing[18],
+    paddingVertical: spacing[12],
+    alignItems: "center" as const,
+  },
+  entry: {
+    paddingVertical: spacing[12],
+  },
+  glassContainer: {
+    height: 64,
+    marginHorizontal: spacing[18],
+  },
+  input: {
+    flex: 1,
+    borderWidth: 0,
+    shadow: "none"
+  },
+});
+
 export default function DeviceConsoleScreen({ route }: Props) {
-  const { identifier } = route.params;
-  const { colors } = useTheme();
-  const { orgId, productId } = useOrgProduct();
-  const executeCode = useExecuteDeviceCode();
+  const { id: deviceId } = route.params;
+  const styles = useThemedStyles(createStyles);
+  const { bottom } = useSafeAreaInsets();
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [code, setCode] = useState("");
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener("keyboardWillShow", () => setKeyboardVisible(true));
+    const hideSub = Keyboard.addListener("keyboardWillHide", () => setKeyboardVisible(false));
+    return () => { showSub.remove(); hideSub.remove(); };
+  }, []);
   const [history, setHistory] = useState<ConsoleEntry[]>([]);
+  const listRef = useRef<FlatList>(null);
 
-  const handleExecute = () => {
+  const onOutput = useCallback((data: string) => {
+    setHistory((prev) => [
+      ...prev,
+      { id: `${Date.now()}-out`, type: "output", text: data },
+    ]);
+  }, []);
+
+  const { status, sendInput } = useConsoleChannel({
+    deviceId,
+    onOutput,
+  });
+
+  const handleSend = () => {
     const trimmed = code.trim();
-    if (!trimmed || !orgId || !productId) return;
+    if (!trimmed || status !== "connected") return;
 
-    const inputEntry: ConsoleEntry = {
-      id: `${Date.now()}-in`,
-      type: "input",
-      text: trimmed,
-    };
-    setHistory((prev) => [...prev, inputEntry]);
+    setHistory((prev) => [
+      ...prev,
+      { id: `${Date.now()}-in`, type: "input", text: trimmed },
+    ]);
+    sendInput(trimmed + "\n");
     setCode("");
-
-    executeCode.mutate(
-      {
-        orgName: orgId,
-        productName: productId,
-        identifier,
-        data: { data: trimmed },
-      },
-      {
-        onSuccess: (result) => {
-          const outputEntry: ConsoleEntry = {
-            id: `${Date.now()}-out`,
-            type: "output",
-            text: typeof result === "string" ? result : JSON.stringify(result, null, 2),
-          };
-          setHistory((prev) => [...prev, outputEntry]);
-        },
-        onError: (error) => {
-          const errorEntry: ConsoleEntry = {
-            id: `${Date.now()}-err`,
-            type: "error",
-            text: error instanceof Error ? error.message : "Execution failed",
-          };
-          setHistory((prev) => [...prev, errorEntry]);
-        },
-      },
-    );
   };
 
   const renderEntry = ({ item }: { item: ConsoleEntry }) => {
     const color =
       item.type === "input"
-        ? colors.textSecondary
+        ? "#999"
         : item.type === "error"
           ? "#E74C3C"
           : "#9ACD32";
@@ -98,64 +123,55 @@ export default function DeviceConsoleScreen({ route }: Props) {
 
   return (
     <KeyboardAvoidingView
-      style={[styles.container, { backgroundColor: colors.background }]}
+      style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={100}
+      keyboardVerticalOffset={0}
     >
+      {status === "connecting" && (
+        <View style={styles.statusBar}>
+          <Typography type="caption" fontSize={11}>
+            Connecting…
+          </Typography>
+        </View>
+      )}
+      {status === "error" && (
+        <View style={styles.statusBar}>
+          <Typography type="caption" fontSize={11} color="#E74C3C">
+            Connection failed
+          </Typography>
+        </View>
+      )}
       <FlatList
+        ref={listRef}
         data={history}
         keyExtractor={(item) => item.id}
         renderItem={renderEntry}
         contentContainerStyle={styles.list}
         style={styles.listContainer}
+        onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: true })}
       />
-      <View style={[styles.inputRow, { borderTopColor: colors.border }]}>
-        <TextInput
-          value={code}
-          onChangeText={setCode}
-          placeholder="Enter Elixir code…"
-          style={styles.input}
-          autoCapitalize="none"
-          autoCorrect={false}
-        />
-        <Button
-          label="Run"
-          type="primary"
-          size="sm"
-          onPress={handleExecute}
-          disabled={!code.trim() || executeCode.isPending}
-          isLoading={executeCode.isPending}
-        />
-      </View>
+        <View style={[styles.glassContainer, { marginBottom: keyboardVisible ? bottom : bottom + 70 }]}>
+          <TextInput
+            value={code}
+            onChangeText={setCode}
+            placeholder={status === "connected" ? "Enter Elixir code…" : "Connecting…"}
+            style={styles.input}
+            autoCapitalize="none"
+            autoCorrect={false}
+            hasShadow={false}
+          editable={status === "connected"}
+          iconRight={<Button
+            label="Send"
+            type="primary"
+            size="sm"
+            pill={false}
+            onPress={handleSend}
+            disabled={!code.trim() || status !== "connected"}
+            iconRight={<SendIcon width={16} height={16} color="white" />}
+          />}
+          />
+
+        </View>
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  listContainer: {
-    flex: 1,
-  },
-  list: {
-    paddingTop: 120,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: 120,
-  },
-  entry: {
-    paddingVertical: spacing.xs,
-  },
-  inputRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    borderTopWidth: 1,
-    paddingBottom: 106
-  },
-  input: {
-    flex: 1,
-  },
-});

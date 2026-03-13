@@ -24,7 +24,7 @@ import PowerIcon from "../../../assets/icons/power.svg";
 import WifiIcon from "../../../assets/icons/wifi-light.svg";
 import TargetIcon from "../../../assets/icons/target.svg";
 import ConsoleIcon from "../../../assets/icons/console.svg";
-type Props = StaticScreenProps<{ identifier: string }>;
+type Props = StaticScreenProps<{ identifier: string, deviceId: number }>;
 
 function MetaRow({ label, value }: { label: string; value?: string | null }) {
   const { colors } = useTheme();
@@ -50,7 +50,7 @@ function MetaRow({ label, value }: { label: string; value?: string | null }) {
 }
 
 export default function DeviceDetailScreen({ route }: Props) {
-  const { identifier } = route.params;
+  const { identifier, deviceId } = route.params;
   const { colors } = useTheme();
   const navigation = useNavigation<any>();
   const { orgId, productId } = useOrgProduct();
@@ -94,7 +94,7 @@ export default function DeviceDetailScreen({ route }: Props) {
     );
 
   const handleNavigateToConsole = () =>
-    navigation.navigate("DeviceConsole", { identifier });
+    navigation.navigate("DeviceConsole", { id: deviceId });
 
   const handleIdentify = () =>
     confirmAction("Identify", () =>
@@ -125,16 +125,6 @@ export default function DeviceDetailScreen({ route }: Props) {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.header}>
-          <Typography
-            type="header"
-            fontSize={26}
-            fontWeight="600"
-            lineHeight={28}
-            flexShrink={1}
-          >
-            {String(device.identifier)}
-          </Typography>
-
           <Tag
             label={device.connection_status === "connected" ? "Online" : "Offline"}
             colorScheme="white"
@@ -149,6 +139,14 @@ export default function DeviceDetailScreen({ route }: Props) {
               },
             }}
           />
+          <Typography
+            type="header"
+            fontSize={26}
+            fontWeight="600"
+            lineHeight={28}
+          >
+            {String(device.identifier)}
+          </Typography>
         </View>
 
         <View style={styles.badgeRow}>
@@ -271,6 +269,7 @@ export default function DeviceDetailScreen({ route }: Props) {
               letterSpacing={1}
               paddingBottom={spacing.xs}
               paddingHorizontal={spacing.lg}
+              marginLeft={spacing.lg}
               color={colors.textTertiary}
             >
               Penalty Box
@@ -294,6 +293,7 @@ export default function DeviceDetailScreen({ route }: Props) {
               paddingBottom={spacing.xs}
               paddingHorizontal={spacing.lg}
               color={colors.textTertiary}
+              marginLeft={spacing.lg}
             >
               Info
             </Typography>
@@ -325,9 +325,8 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xl,
   },
   header: {
-    flexDirection: "row",
-    // justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: "column",
+    alignItems: "flex-start",
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.lg,
     paddingBottom: spacing.md,
@@ -343,6 +342,7 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: spacing.md,
     flex: 1,
+    gap: spacing.sm
   },
   metaRow: {
     flexDirection: "row",

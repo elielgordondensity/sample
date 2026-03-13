@@ -13,9 +13,11 @@ import {
   TouchableOpacity,
   Pressable,
 } from 'react-native';
+import { LiquidGlassView } from '@callstack/liquid-glass';
 
 import useThemedStyles from '../../theme/useThemedStyles';
-import { colors, ColorTheme } from '../../theme/colors';
+import { ColorTheme } from '../../theme/colors';
+import { useTheme } from '../../theme/ThemeProvider';
 // Icons
 // import CloseIcon from '../../../assets/icons/close-circle-filled.svg';
 
@@ -40,6 +42,7 @@ const ClearButton = React.memo(
 
 export const TextInput = forwardRef<Input, TextInputOverlayProps>(
   function TextInput(props, ref) {
+    const theme = useTheme()
     const themedStyles = useThemedStyles(createStyles);
     const {
       iconLeft,
@@ -83,8 +86,7 @@ export const TextInput = forwardRef<Input, TextInputOverlayProps>(
       [disabled],
     );
     const pillStyle = useMemo(
-      () =>
-        pill ? { borderRadius: 30, borderCurve: 'continuous' as const } : null,
+      () => ({ borderRadius: pill ? 30 : 20 }),
       [pill],
     );
 
@@ -158,7 +160,7 @@ export const TextInput = forwardRef<Input, TextInputOverlayProps>(
     }, [disabled, ref]);
 
     return (
-      <View style={containerStyle}>
+      <LiquidGlassView interactive effect='regular' colorScheme={theme.mode} style={containerStyle}>
         {iconLeft}
         <Input
           editable={!disabled}
@@ -182,7 +184,7 @@ export const TextInput = forwardRef<Input, TextInputOverlayProps>(
             />
           ) : null}
         </View>
-      </View>
+      </LiquidGlassView>
     );
   },
 );
@@ -194,19 +196,30 @@ const createStyles = (colors: ColorTheme) =>
       paddingLeft: 14,
       paddingRight: 8,
       backgroundColor: colors.backgroundSecondary,
-      // paddingHorizontal: 14,
       flexDirection: 'row',
       alignItems: 'center',
       gap: 8,
-      borderRadius: 18,
       borderCurve: 'continuous',
       borderWidth: StyleSheet.hairlineWidth,
-      borderColor: colors.inputBorder,
+      borderColor: colors.borderLight,
     },
     shadow: {
-      shadowOffset: { width: 0.5, height: 2 },
-      shadowOpacity: 0.06,
-      shadowRadius: 2,
+      boxShadow: [
+        {
+          color: `${colors.black}08`,
+          offsetX: 1,
+          offsetY: 4,
+          blurRadius: 8,
+          spreadDistance: 2,
+        },
+        {
+          color: `${colors.black}20`,
+          offsetX: 0,
+          offsetY: 0,
+          blurRadius: 1,
+          spreadDistance: 0,
+        },
+      ],
     },
     placeholderText: {
       color: colors.textCaption,
@@ -216,8 +229,8 @@ const createStyles = (colors: ColorTheme) =>
       flex: 1,
       fontWeight: '500',
       fontSize: 16,
+      color: colors.textBody,
       borderColor: colors.border,
-      // fontFamily: 'Inter Variable',
       height: '100%',
     },
     iconContainer: {

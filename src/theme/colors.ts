@@ -172,7 +172,7 @@ export const COLORS_LIGHT: ColorTheme = {
   white: "#FFFFFF",
   black: "#010409",
   colors: {
-    primary: "#1D2C38",
+    primary: "#6366F1",
     secondary: colors.amber[3],
     background: "#F4F5F6",
   },

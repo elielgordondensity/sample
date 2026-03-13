@@ -14,7 +14,7 @@ export const BUTTON_SIZES = {
 export function getButtonVariants(isDark: boolean) {
   return {
     primary: {
-      backgroundColor: isDark ? colors.blue['600'] : colors.midnight[2],
+      backgroundColor:  "#6366F1",
       textColor: isDark ? '#F0F3F6' : colors.blue['000'],
       borderColor: '#102C4C00',
       borderWidth: 0,

@@ -30,6 +30,7 @@ function SectionLabel({ title }: { title: string }) {
       letterSpacing={1}
       paddingBottom={spacing.xs}
       paddingHorizontal={spacing.lg}
+      marginLeft={spacing.lg}
       color={colors.textTertiary}
     >
       {title}
@@ -148,11 +149,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    paddingTop: 120,
+    paddingTop: 80,
     paddingBottom: spacing.xl,
   },
   section: {
     marginBottom: spacing.md,
+    gap: spacing.sm
   },
   switchButton: {
     alignSelf: "flex-start",

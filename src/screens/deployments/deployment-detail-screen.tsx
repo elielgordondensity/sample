@@ -9,6 +9,7 @@ import type { StaticScreenProps } from "@react-navigation/native";
 import type { DeploymentGroup } from "../../api/generated/schemas";
 
 import CheckCircleIcon from "../../../assets/icons/check-circle.svg";
+import CloseIcon from "../../../assets/icons/close-big.svg";
 
 type Props = StaticScreenProps<{ deployment: DeploymentGroup }>;
 
@@ -43,17 +44,8 @@ export default function DeploymentDetailScreen({ route }: Props) {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.content}>
         <View style={styles.header}>
-          <Typography
-            type="header"
-            fontSize={26}
-            fontWeight="600"
-            lineHeight={28}
-            flexShrink={1}
-          >
-            {dg.name}
-          </Typography>
           <Tag
             label={isActive ? "Active" : "Inactive"}
             colorScheme="white"
@@ -62,14 +54,23 @@ export default function DeploymentDetailScreen({ route }: Props) {
             size="sm"
             adjustIconPadding
             iconLeft={{
-              component: CheckCircleIcon,
+              component: isActive ? CheckCircleIcon : CloseIcon,
               props: {
-                width: 16,
-                height: 16,
+                width: isActive ? 16 : 14,
+                height: isActive ? 16 : 14,
                 color: isActive ? "#9ACD32" : "#E0E3E6",
+                fill: isActive ? "#9ACD32" : "#E0E3E6",
               },
             }}
           />
+          <Typography
+            type="header"
+            fontSize={26}
+            fontWeight="600"
+            lineHeight={28}
+          >
+            {dg.name}
+          </Typography>
         </View>
 
         {dg.firmware && (
@@ -81,6 +82,7 @@ export default function DeploymentDetailScreen({ route }: Props) {
               letterSpacing={1}
               paddingBottom={spacing.xs}
               paddingHorizontal={spacing.lg}
+              marginLeft={spacing.lg}
               color={colors.textTertiary}
             >
               Firmware
@@ -113,6 +115,7 @@ export default function DeploymentDetailScreen({ route }: Props) {
               letterSpacing={1}
               paddingBottom={spacing.xs}
               paddingHorizontal={spacing.lg}
+              marginLeft={spacing.lg}
               color={colors.textTertiary}
             >
               Conditions
@@ -152,10 +155,10 @@ export default function DeploymentDetailScreen({ route }: Props) {
             textTransform="uppercase"
             letterSpacing={1}
             paddingBottom={spacing.xs}
+            paddingHorizontal={spacing.lg}
+            marginLeft={spacing.lg}
             color={colors.textTertiary}
-          >
-            Info
-          </Typography>
+          >Info</Typography>
           <Card>
             {dg.device_count != null && (
               <MetaRow label="Devices" value={`${dg.device_count}`} />
@@ -191,16 +194,16 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xl,
   },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: "column",
+    alignItems: "flex-start",
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.lg,
     paddingBottom: spacing.lg,
-    gap: spacing.sm,
+    gap: spacing.md,
   },
   section: {
     marginBottom: spacing.md,
+    gap: spacing.md
   },
   metaRow: {
     flexDirection: "row",

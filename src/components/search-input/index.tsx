@@ -21,6 +21,7 @@ export const SearchInput = forwardRef<NativeTextInput, SearchInputProps>(functio
       ref={ref ?? fallbackRef}
       inputMode="search"
       pill={false}
+      hasShadow={false}
       iconLeft={
         <SearchIcon
           pointerEvents="none"

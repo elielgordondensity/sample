@@ -157,7 +157,8 @@ export default function DevicesScreen() {
       device={item}
       onPress={(device) =>
         navigation.navigate("DeviceDetail", {
-          identifier: String(device.identifier),
+          deviceId: device.id!,
+          identifier: String(device.identifier!),
         })
       }
     />

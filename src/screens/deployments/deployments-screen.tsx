@@ -9,6 +9,7 @@ import { Tag } from "../../components/tag";
 import { useDeployments } from "../../hooks/useApi";
 import type { DeploymentGroup } from "../../api/generated/schemas";
 import CheckCircleIcon from "../../../assets/icons/check-circle.svg";
+import CloseIcon from "../../../assets/icons/close-big.svg";
 
 export default function DeploymentsScreen() {
   const { colors } = useTheme();
@@ -57,11 +58,12 @@ export default function DeploymentsScreen() {
             hasBorder
             size="sm"
             iconLeft={{
-              component: CheckCircleIcon,
+              component: isActive ? CheckCircleIcon : CloseIcon,
               props: {
-                width: 16,
-                height: 16,
+                width: isActive ? 16 : 14,
+                height: isActive ? 16 : 14,
                 color: isActive ? "#9ACD32" : "#E0E3E6",
+                fill: isActive ? "#9ACD32" : "#E0E3E6",
               },
             }}
           />
@@ -216,6 +218,7 @@ export default function DeploymentsScreen() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <FlatList
+        style={{ flex: 1 }}
         data={deployments}
         keyExtractor={(item) => String(item.id ?? item.name)}
         renderItem={renderDeployment}
@@ -247,7 +250,7 @@ const styles = StyleSheet.create({
   list: {
     paddingTop: 120,
     paddingBottom: 120,
-    flex: 1
+    flexGrow: 1
   },
   listHeader: {
     paddingHorizontal: spacing.lg,

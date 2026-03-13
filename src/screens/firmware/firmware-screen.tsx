@@ -148,6 +148,7 @@ export default function FirmwareScreen() {
           />
         }
         contentContainerStyle={styles.list}
+        style={{ flex: 1 }}
         ItemSeparatorComponent={() => <View style={{ height: 3 }} />}
         refreshControl={
           <RefreshControl
